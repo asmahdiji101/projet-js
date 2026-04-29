@@ -52,8 +52,10 @@ final class CartController extends Controller
         }
 
         $ticketModel = new Ticket();
+        $currentQuantity = (int) ($_SESSION['cart'][$ticketId] ?? 0);
+        $requestedQuantity = $currentQuantity + $quantity;
 
-        if (!$ticketModel->canReserve($ticketId, $quantity)) {
+        if (!$ticketModel->canReserve($ticketId, $requestedQuantity)) {
             $_SESSION['flash_error'] = 'Not enough tickets available.';
             redirect('/cart');
         }

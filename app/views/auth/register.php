@@ -26,6 +26,19 @@
             <input type="password" name="confirm_password" required>
         </label>
 
+        <fieldset style="border:1px solid #ccc;padding:1rem;border-radius:4px;margin:1rem 0;">
+            <legend>Type de compte</legend>
+            <label>
+                <input type="radio" name="account_type" value="participant" checked> 
+                Participant (book events, receive notifications)
+            </label>
+            <br>
+            <label>
+                <input type="radio" name="account_type" value="artist"> 
+                Artist (create events for approval)
+            </label>
+        </fieldset>
+
         <button type="submit" class="button button-primary">Créer le compte</button>
     </form>
 </section>

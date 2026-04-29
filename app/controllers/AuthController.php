@@ -53,6 +53,7 @@ final class AuthController extends Controller
         $email = trim($_POST['email'] ?? '');
         $password = (string) ($_POST['password'] ?? '');
         $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
+        $accountType = trim($_POST['account_type'] ?? 'participant');
 
         if ($fullName === '' || $email === '' || $password === '') {
             $this->render('auth/register', [
@@ -80,13 +81,15 @@ final class AuthController extends Controller
             return;
         }
 
-        $userId = $userModel->create($fullName, $email, password_hash($password, PASSWORD_DEFAULT));
+        $role = ($accountType === 'artist') ? 'artist' : 'user';
+
+        $userId = $userModel->create($fullName, $email, password_hash($password, PASSWORD_DEFAULT), $role);
 
         $_SESSION['user'] = [
             'id' => $userId,
             'full_name' => $fullName,
             'email' => $email,
-            'role' => 'user',
+            'role' => $role,
         ];
 
         $redirectTo = $_SESSION['intended'] ?? '/dashboard';
@@ -102,10 +105,24 @@ final class AuthController extends Controller
         }
 
         $bookings = (new Booking())->byUser((int) $_SESSION['user']['id']);
+        $notifications = [];
+        $artistEvents = [];
+
+        // Get notifications
+        $notificationModel = new \App\Models\Notification();
+        $notifications = $notificationModel->byUser((int) $_SESSION['user']['id']);
+
+        // If artist, show their events
+        if ($_SESSION['user']['role'] === 'artist') {
+            $eventModel = new \App\Models\Event();
+            $artistEvents = $eventModel->byArtistUser((int) $_SESSION['user']['id']);
+        }
 
         $this->render('auth/dashboard', [
             'user' => $_SESSION['user'],
             'bookings' => $bookings,
+            'notifications' => $notifications,
+            'artistEvents' => $artistEvents,
         ]);
     }
 

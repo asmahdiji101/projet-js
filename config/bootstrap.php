@@ -76,3 +76,9 @@ function e(?string $value): string
 {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
+
+function get_markup_price(float $price): float
+{
+    return round($price * 1.1, 2);
+}
+

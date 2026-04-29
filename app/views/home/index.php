@@ -8,7 +8,9 @@
         </p>
         <div class="hero-actions">
             <a class="button button-primary" href="/events">Explore events</a>
-            <a class="button button-secondary" href="#">Admin demo</a>
+            <?php if (is_admin()): ?>
+                <a class="button button-secondary" href="#">Admin demo</a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -28,12 +30,19 @@
     </div>
 
     <div class="cards">
-        <?php foreach ($featuredEvents as $event): ?>
-            <article class="card">
-                <h3><?= e($event['title']) ?></h3>
-                <p><?= e($event['subtitle']) ?></p>
-                <strong><?= e($event['price']) ?></strong>
-            </article>
-        <?php endforeach; ?>
+        <?php if (empty($featuredEvents)): ?>
+            <div class="auth-card"><p>No featured events yet.</p></div>
+        <?php else: ?>
+            <?php foreach ($featuredEvents as $event): ?>
+                <article class="card">
+                    <h3><?= e($event['title']) ?></h3>
+                    <?php if (!empty($event['image_path'])): ?>
+                        <img src="<?= e($event['image_path']) ?>" alt="<?= e($event['title']) ?>" style="max-width:100%;border-radius:8px;">
+                    <?php endif; ?>
+                    <p><?= e($event['description']) ?></p>
+                    <small><?= e($event['event_date']) ?> — <?= e($event['location']) ?></small>
+                </article>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </section>

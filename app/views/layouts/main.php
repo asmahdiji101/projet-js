@@ -19,9 +19,12 @@
             <a href="/">Accueil</a>
             <a href="/events">Événements</a>
             <a href="/cart">Panier</a>
+            <a href="/contact">Contact</a>
             <?php if (is_authenticated()): ?>
                 <a href="/dashboard">Mon compte</a>
                 <?php if (is_admin()): ?>
+                    <a href="/events/create">Créer un événement</a>
+                    <a href="/artists">Artistes</a>
                     <a href="/admin">Administration</a>
                 <?php endif; ?>
                 <a href="/logout">Déconnexion</a>

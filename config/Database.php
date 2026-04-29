@@ -103,6 +103,7 @@ final class Database
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             artist_id INTEGER NOT NULL,
+            user_artist_id INTEGER DEFAULT NULL,
             title TEXT NOT NULL,
             slug TEXT NOT NULL UNIQUE,
             description TEXT NOT NULL,
@@ -110,8 +111,10 @@ final class Database
             location TEXT NOT NULL,
             image_path TEXT DEFAULT NULL,
             status TEXT NOT NULL DEFAULT 'draft',
+            approval_status TEXT NOT NULL DEFAULT 'pending',
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
+            FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_artist_id) REFERENCES users(id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS tickets (
@@ -135,6 +138,31 @@ final class Database
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS contact_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender_id INTEGER NOT NULL,
+            sender_type TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            message TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            admin_reply TEXT DEFAULT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            replied_at TEXT DEFAULT NULL,
+            FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            related_id INTEGER DEFAULT NULL,
+            is_read INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
         SQL;
 

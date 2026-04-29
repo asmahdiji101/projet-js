@@ -32,4 +32,28 @@ final class Artist extends BaseModel
 
         return (int) $this->db->lastInsertId();
     }
+
+    public function findById(int $id): ?array
+    {
+        return $this->fetchOne('SELECT * FROM artists WHERE id = :id LIMIT 1', [':id' => $id]);
+    }
+
+    public function update(int $id, string $name, string $slug, string $description, ?string $imagePath = null): bool
+    {
+        return $this->execute(
+            'UPDATE artists SET name = :name, slug = :slug, description = :description, image_path = COALESCE(:image_path, image_path) WHERE id = :id',
+            [
+                ':id' => $id,
+                ':name' => $name,
+                ':slug' => $slug,
+                ':description' => $description,
+                ':image_path' => $imagePath,
+            ]
+        );
+    }
+
+    public function delete(int $id): bool
+    {
+        return $this->execute('DELETE FROM artists WHERE id = :id', [':id' => $id]);
+    }
 }

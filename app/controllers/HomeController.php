@@ -5,26 +5,19 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\Event;
 
 final class HomeController extends Controller
 {
     public function index(): void
     {
-        $featuredEvents = [
-            [
-                'title' => 'Neon Night Live',
-                'subtitle' => 'Festival urbain, scène DJ et performances visuelles',
-                'price' => 'From 25€',
-            ],
-            [
-                'title' => 'Skyline Culture Pass',
-                'subtitle' => 'Expériences premium, ateliers et accès VIP',
-                'price' => 'From 18€',
-            ],
-        ];
+        $events = (new Event())->allPublished();
+
+        // Show up to 3 featured events on the home page
+        $featured = array_slice($events, 0, 3);
 
         $this->render('home/index', [
-            'featuredEvents' => $featuredEvents,
+            'featuredEvents' => $featured,
         ]);
     }
 }

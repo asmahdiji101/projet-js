@@ -24,4 +24,14 @@
             <strong><?= e(number_format((float) $stats['revenue'], 2)) ?> EUR</strong>
         </article>
     </div>
+
+    <div class="section-heading" style="margin-top:2rem;">
+        <span>Admin Tools</span>
+        <h2>Management</h2>
+    </div>
+
+    <div class="hero-actions">
+        <a class="button button-primary" href="/admin/pending-events">Pending Event Approvals</a>
+        <a class="button button-primary" href="/admin/messages">Contact Messages</a>
+    </div>
 </section>

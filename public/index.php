@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/config/bootstrap.php';
 
+use App\Controllers\ArtistController;
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
-use App\Controllers\HomeController;
-use App\Controllers\ArtistController;
 use App\Controllers\CartController;
 use App\Controllers\EventController;
+use App\Controllers\HomeController;
+use App\Controllers\TicketController;
+use App\Controllers\ContactController;
+use App\Controllers\AdminMessagingController;
 
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $uri = rtrim($uri, '/') ?: '/';
@@ -22,6 +25,86 @@ if ($method === 'POST' && $uri === '/login') {
 
 if ($method === 'POST' && $uri === '/register') {
     (new AuthController())->register();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/events/store') {
+    (new EventController())->store();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/events/update') {
+    (new EventController())->update();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/events/delete') {
+    (new EventController())->delete();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/artists/store') {
+    (new ArtistController())->store();
+    return;
+}
+ 
+if ($method === 'POST' && $uri === '/artists/update') {
+    (new ArtistController())->update();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/artists/delete') {
+    (new ArtistController())->delete();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/tickets/store') {
+    (new TicketController())->store();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/tickets/update') {
+    (new TicketController())->update();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/tickets/delete') {
+    (new TicketController())->delete();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/cart/add') {
+    (new CartController())->add();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/cart/remove') {
+    (new CartController())->remove();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/checkout') {
+    (new CartController())->checkout();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/contact/store') {
+    (new ContactController())->store();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/admin/message/reply') {
+    (new AdminMessagingController())->reply();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/admin/event/approve') {
+    (new AdminMessagingController())->approveEvent();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/admin/event/reject') {
+    (new AdminMessagingController())->rejectEvent();
     return;
 }
 
@@ -44,47 +127,42 @@ switch ($uri) {
     case '/events':
         (new EventController())->index();
         break;
-        case '/artists':
-            (new ArtistController())->index();
-            break;
-        case '/artists/create':
-            (new ArtistController())->create();
-            break;
-        case '/artists/store':
-            if ($method === 'POST') {
-                (new ArtistController())->store();
-                break;
-            }
-            http_response_code(405);
-            echo 'Method Not Allowed';
-            break;
-        case '/cart':
-            (new CartController())->index();
-            break;
-        case '/cart/add':
-            if ($method === 'POST') {
-                (new CartController())->add();
-                break;
-            }
-            http_response_code(405);
-            echo 'Method Not Allowed';
-            break;
-        case '/cart/remove':
-            if ($method === 'POST') {
-                (new CartController())->remove();
-                break;
-            }
-            http_response_code(405);
-            echo 'Method Not Allowed';
-            break;
-        case '/checkout':
-            if ($method === 'POST') {
-                (new CartController())->checkout();
-                break;
-            }
-            http_response_code(405);
-            echo 'Method Not Allowed';
-            break;
+    case '/events/create':
+        (new EventController())->create();
+        break;
+    case '/events/edit':
+        (new EventController())->edit();
+        break;
+    case '/artists':
+        (new ArtistController())->index();
+        break;
+    case '/artists/create':
+        (new ArtistController())->create();
+        break;
+    case '/artists/edit':
+        (new ArtistController())->edit();
+        break;
+    case '/cart':
+        (new CartController())->index();
+        break;
+    case '/contact':
+        (new ContactController())->show();
+        break;
+    case '/admin/messages':
+        (new AdminMessagingController())->messages();
+        break;
+    case '/admin/message':
+        (new AdminMessagingController())->showMessage();
+        break;
+    case '/admin/pending-events':
+        (new AdminMessagingController())->pendingEvents();
+        break;
+    case '/tickets/create':
+        (new TicketController())->create();
+        break;
+    case '/tickets/edit':
+        (new TicketController())->edit();
+        break;
     case '/logout':
         (new AuthController())->logout();
         break;

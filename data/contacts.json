@@ -1,0 +1,8 @@
+[
+    {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "message": "Great platform! I have a question about the ticketing system.",
+        "created_at": "2026-04-29T12:40:15+00:00"
+    }
+]

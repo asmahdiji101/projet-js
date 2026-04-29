@@ -215,6 +215,16 @@ main {
     color: var(--text);
 }
 
+.auth-form textarea,
+.auth-form select {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 0.9rem;
+    border: 1px solid var(--border);
+    background: rgba(8, 14, 26, 0.8);
+    color: var(--text);
+}
+
 .alert {
     padding: 0.9rem 1rem;
     border-radius: 0.9rem;
@@ -277,6 +287,10 @@ main {
 
 .ticket-form input[type="number"] {
     width: 5rem;
+}
+
+.hero-actions form {
+    margin: 0;
 }
 
 .card {

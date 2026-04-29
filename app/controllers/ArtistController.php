@@ -72,4 +72,103 @@ final class ArtistController extends Controller
 
         redirect('/artists');
     }
+
+    public function edit(): void
+    {
+        if (!is_admin()) {
+            http_response_code(403);
+            echo 'Forbidden';
+            return;
+        }
+
+        $id = (int) ($_GET['id'] ?? 0);
+        $artist = (new Artist())->findById($id);
+
+        if ($artist === null) {
+            http_response_code(404);
+            echo 'Artist not found';
+            return;
+        }
+
+        $this->render('artist/edit', ['artist' => $artist]);
+    }
+
+    public function update(): void
+    {
+        if (!is_admin()) {
+            http_response_code(403);
+            echo 'Forbidden';
+            return;
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+        $artist = (new Artist())->findById($id);
+
+        if ($artist === null) {
+            redirect('/artists');
+            return;
+        }
+
+        $name = trim($_POST['name'] ?? '') ;
+        $description = trim($_POST['description'] ?? '');
+
+        if ($name === '' || $description === '') {
+            $this->render('artist/edit', ['artist' => $artist, 'error' => 'All fields are required.']);
+            return;
+        }
+
+        $slug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($name)));
+        $imagePath = null;
+
+        if (!empty($_FILES['image']['tmp_name'])) {
+            $uploadDir = '/uploads/artists/';
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $filename = $slug . '-' . time() . '.' . $ext;
+            $target = PUBLIC_PATH . $uploadDir . $filename;
+
+            if (!in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'webp'], true)) {
+                $this->render('artist/edit', ['artist' => $artist, 'error' => 'Invalid image type.']);
+                return;
+            }
+
+            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+                $this->render('artist/edit', ['artist' => $artist, 'error' => 'Failed to move uploaded file.']);
+                return;
+            }
+
+            $imagePath = $uploadDir . $filename;
+        }
+
+        (new Artist())->update($id, $name, $slug, $description, $imagePath);
+
+        redirect('/artists');
+    }
+
+    public function delete(): void
+    {
+        if (!is_admin()) {
+            http_response_code(403);
+            echo 'Forbidden';
+            return;
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+        $artist = (new Artist())->findById($id);
+
+        if ($artist === null) {
+            redirect('/artists');
+            return;
+        }
+
+        if (!empty($artist['image_path'])) {
+            $file = PUBLIC_PATH . $artist['image_path'];
+            if (is_file($file)) {
+                @unlink($file);
+            }
+        }
+
+        (new Artist())->delete($id);
+
+        redirect('/artists');
+    }
 }
