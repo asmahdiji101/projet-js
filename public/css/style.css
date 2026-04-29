@@ -227,6 +227,58 @@ main {
     color: #ffbaba;
 }
 
+.alert-success {
+    background: rgba(77, 225, 193, 0.12);
+    border: 1px solid rgba(77, 225, 193, 0.3);
+    color: #b7fff0;
+}
+
+.cart-items {
+    display: grid;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: rgba(8, 14, 26, 0.8);
+    border: 1px solid var(--border);
+}
+
+.cart-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.ticket-list {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.ticket-form {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    padding: 0.85rem;
+    border-radius: 0.9rem;
+    background: rgba(8, 14, 26, 0.6);
+    border: 1px solid var(--border);
+}
+
+.ticket-form input[type="number"] {
+    width: 5rem;
+}
+
 .card {
     padding: 1.5rem;
 }

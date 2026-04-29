@@ -66,6 +66,12 @@ final class Database
             if (!file_exists($sqliteFile) || filesize($sqliteFile) === 0) {
                 self::initializeSqlite(self::$instance);
             }
+
+            $row = self::$instance->query('SELECT COUNT(*) AS count FROM users')->fetch();
+
+            if ((int) ($row['count'] ?? 0) === 0) {
+                self::seedSqlite(self::$instance);
+            }
         } catch (PDOException $exception) {
             throw new RuntimeException('SQLite connection failed: ' . $exception->getMessage(), 0, $exception);
         }
@@ -133,5 +139,26 @@ final class Database
         SQL;
 
         $pdo->exec($sql);
+    }
+
+    private static function seedSqlite(PDO $pdo): void
+    {
+        $pdo->exec("INSERT INTO users (full_name, email, password_hash, role) VALUES
+            ('Admin User', 'admin@neonpass.local', '" . password_hash('admin123', PASSWORD_DEFAULT) . "', 'admin'),
+            ('Demo User', 'user@neonpass.local', '" . password_hash('user123', PASSWORD_DEFAULT) . "', 'user')");
+
+        $pdo->exec("INSERT INTO artists (name, slug, description, image_path) VALUES
+            ('Neon Pulse', 'neon-pulse', 'Electronic and live performance collective.', NULL)");
+
+        $artistId = (int) $pdo->lastInsertId();
+
+        $pdo->exec("INSERT INTO events (artist_id, title, slug, description, event_date, location, image_path, status) VALUES
+            ($artistId, 'Neon Night Live', 'neon-night-live', 'A glowing mixed-media night event.', '2026-05-10 19:30:00', 'Paris Hall 1', NULL, 'published')");
+
+        $eventId = (int) $pdo->lastInsertId();
+
+        $pdo->exec("INSERT INTO tickets (event_id, name, price, quantity_total, quantity_sold) VALUES
+            ($eventId, 'Standard', 25.00, 120, 0),
+            ($eventId, 'VIP', 55.00, 30, 0)");
     }
 }

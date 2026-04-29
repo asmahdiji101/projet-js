@@ -11,6 +11,12 @@ final class User extends BaseModel
         return $this->fetchOne('SELECT * FROM users WHERE email = :email LIMIT 1', [':email' => $email]);
     }
 
+    public function countAll(): int
+    {
+        $row = $this->fetchOne('SELECT COUNT(*) AS count FROM users');
+        return (int) ($row['count'] ?? 0);
+    }
+
     public function create(string $fullName, string $email, string $passwordHash, string $role = 'user'): int
     {
         $this->execute(

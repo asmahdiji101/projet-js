@@ -17,7 +17,8 @@
         </div>
         <nav class="nav">
             <a href="/">Accueil</a>
-            <a href="#">Événements</a>
+            <a href="/events">Événements</a>
+            <a href="/cart">Panier</a>
             <?php if (is_authenticated()): ?>
                 <a href="/dashboard">Mon compte</a>
                 <?php if (is_admin()): ?>

@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\Artist;
+use App\Models\Booking;
+use App\Models\Event;
+use App\Models\User;
 
 final class AdminController extends Controller
 {
@@ -18,10 +22,11 @@ final class AdminController extends Controller
         }
 
         $stats = [
-            'users' => 0,
-            'artists' => 0,
-            'events' => 0,
-            'bookings' => 0,
+            'users' => (new User())->countAll(),
+            'artists' => (new Artist())->countAll(),
+            'events' => (new Event())->countAll(),
+            'bookings' => (new Booking())->countAll(),
+            'revenue' => (new Booking())->totalRevenue(),
         ];
 
         $this->render('admin/dashboard', [

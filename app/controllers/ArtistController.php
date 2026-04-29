@@ -68,14 +68,7 @@ final class ArtistController extends Controller
             $imagePath = $uploadDir . $filename;
         }
 
-        $model = new Artist();
-        $model->db->prepare('INSERT INTO artists (name, slug, description, image_path) VALUES (:name, :slug, :description, :image_path)')
-            ->execute([
-                ':name' => $name,
-                ':slug' => $slug,
-                ':description' => $description,
-                ':image_path' => $imagePath,
-            ]);
+        (new Artist())->create($name, $slug, $description, $imagePath);
 
         redirect('/artists');
     }

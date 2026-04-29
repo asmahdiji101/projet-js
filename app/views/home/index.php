@@ -7,7 +7,7 @@
             ticket booking and admin analytics.
         </p>
         <div class="hero-actions">
-            <a class="button button-primary" href="#featured">Explore events</a>
+            <a class="button button-primary" href="/events">Explore events</a>
             <a class="button button-secondary" href="#">Admin demo</a>
         </div>
     </div>

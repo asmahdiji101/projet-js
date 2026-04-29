@@ -19,5 +19,9 @@
             <h3>Réservations</h3>
             <strong><?= e((string) $stats['bookings']) ?></strong>
         </article>
+        <article class="card">
+            <h3>Revenu</h3>
+            <strong><?= e(number_format((float) $stats['revenue'], 2)) ?> EUR</strong>
+        </article>
     </div>
 </section>

@@ -8,6 +8,8 @@ use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\HomeController;
 use App\Controllers\ArtistController;
+use App\Controllers\CartController;
+use App\Controllers\EventController;
 
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $uri = rtrim($uri, '/') ?: '/';
@@ -39,6 +41,9 @@ switch ($uri) {
     case '/admin':
         (new AdminController())->dashboard();
         break;
+    case '/events':
+        (new EventController())->index();
+        break;
         case '/artists':
             (new ArtistController())->index();
             break;
@@ -48,6 +53,33 @@ switch ($uri) {
         case '/artists/store':
             if ($method === 'POST') {
                 (new ArtistController())->store();
+                break;
+            }
+            http_response_code(405);
+            echo 'Method Not Allowed';
+            break;
+        case '/cart':
+            (new CartController())->index();
+            break;
+        case '/cart/add':
+            if ($method === 'POST') {
+                (new CartController())->add();
+                break;
+            }
+            http_response_code(405);
+            echo 'Method Not Allowed';
+            break;
+        case '/cart/remove':
+            if ($method === 'POST') {
+                (new CartController())->remove();
+                break;
+            }
+            http_response_code(405);
+            echo 'Method Not Allowed';
+            break;
+        case '/checkout':
+            if ($method === 'POST') {
+                (new CartController())->checkout();
                 break;
             }
             http_response_code(405);

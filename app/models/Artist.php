@@ -10,4 +10,26 @@ final class Artist extends BaseModel
     {
         return $this->fetchAll('SELECT * FROM artists ORDER BY created_at DESC');
     }
+
+    public function countAll(): int
+    {
+        $row = $this->fetchOne('SELECT COUNT(*) AS count FROM artists');
+
+        return (int) ($row['count'] ?? 0);
+    }
+
+    public function create(string $name, string $slug, string $description, ?string $imagePath = null): int
+    {
+        $this->execute(
+            'INSERT INTO artists (name, slug, description, image_path) VALUES (:name, :slug, :description, :image_path)',
+            [
+                ':name' => $name,
+                ':slug' => $slug,
+                ':description' => $description,
+                ':image_path' => $imagePath,
+            ]
+        );
+
+        return (int) $this->db->lastInsertId();
+    }
 }

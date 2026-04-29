@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\Booking;
 use App\Models\User;
 
 final class AuthController extends Controller
@@ -40,7 +41,10 @@ final class AuthController extends Controller
             'role' => $user['role'],
         ];
 
-        redirect('/dashboard');
+        $redirectTo = $_SESSION['intended'] ?? '/dashboard';
+        unset($_SESSION['intended']);
+
+        redirect($redirectTo);
     }
 
     public function register(): void
@@ -85,7 +89,10 @@ final class AuthController extends Controller
             'role' => 'user',
         ];
 
-        redirect('/dashboard');
+        $redirectTo = $_SESSION['intended'] ?? '/dashboard';
+        unset($_SESSION['intended']);
+
+        redirect($redirectTo);
     }
 
     public function dashboard(): void
@@ -94,8 +101,11 @@ final class AuthController extends Controller
             redirect('/login');
         }
 
+        $bookings = (new Booking())->byUser((int) $_SESSION['user']['id']);
+
         $this->render('auth/dashboard', [
             'user' => $_SESSION['user'],
+            'bookings' => $bookings,
         ]);
     }
 
