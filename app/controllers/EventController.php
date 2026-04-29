@@ -97,7 +97,7 @@ final class EventController extends Controller
 
         // Artists can only create events for themselves
         if ($isArtist) {
-            $artistId = 0; // Placeholder
+            $artistId = null; // Artists use user_artist_id instead
             $status = 'draft';
             $approvalStatus = 'pending';
             $userArtistId = (int) $_SESSION['user']['id'];
@@ -298,4 +298,19 @@ final class EventController extends Controller
 
         return trim($slug, '-');
     }
+
+        public function artistEvents(): void
+        {
+            if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'artist') {
+                redirect('/login');
+                return;
+            }
+
+            $userId = (int) $_SESSION['user']['id'];
+            $events = (new Event())->byArtistUser($userId);
+
+            $this->render('event/artist-events', [
+                'events' => $events,
+            ]);
+        }
 }

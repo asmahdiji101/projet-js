@@ -17,15 +17,16 @@ final class User extends BaseModel
         return (int) ($row['count'] ?? 0);
     }
 
-    public function create(string $fullName, string $email, string $passwordHash, string $role = 'user'): int
+    public function create(string $fullName, string $email, string $passwordHash, string $role = 'user', ?string $profilePicturePath = null): int
     {
         $this->execute(
-            'INSERT INTO users (full_name, email, password_hash, role) VALUES (:full_name, :email, :password_hash, :role)',
+            'INSERT INTO users (full_name, email, password_hash, role, profile_picture_path) VALUES (:full_name, :email, :password_hash, :role, :profile_picture_path)',
             [
                 ':full_name' => $fullName,
                 ':email' => $email,
                 ':password_hash' => $passwordHash,
                 ':role' => $role,
+                ':profile_picture_path' => $profilePicturePath,
             ]
         );
 

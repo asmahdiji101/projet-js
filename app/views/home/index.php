@@ -25,15 +25,15 @@
 
 <section class="featured" id="featured">
     <div class="section-heading">
-        <span>Featured concepts</span>
-        <h2>Events designed for the project scope</h2>
+        <span>Available now</span>
+        <h2>All events on NeonPass</h2>
     </div>
 
     <div class="cards">
-        <?php if (empty($featuredEvents)): ?>
-            <div class="auth-card"><p>No featured events yet.</p></div>
+        <?php if (empty($events)): ?>
+            <div class="auth-card"><p>No events available yet.</p></div>
         <?php else: ?>
-            <?php foreach ($featuredEvents as $event): ?>
+            <?php foreach ($events as $event): ?>
                 <article class="card">
                     <h3><?= e($event['title']) ?></h3>
                     <?php if (!empty($event['image_path'])): ?>

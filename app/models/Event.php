@@ -52,7 +52,7 @@ final class Event extends BaseModel
         return $this->fetchOne('SELECT * FROM events WHERE id = :id LIMIT 1', [':id' => $id]);
     }
 
-    public function create(int $artistId, string $title, string $slug, string $description, string $eventDate, string $location, ?string $imagePath, string $status = 'published', string $approvalStatus = 'approved', ?int $userArtistId = null): int
+    public function create(?int $artistId, string $title, string $slug, string $description, string $eventDate, string $location, ?string $imagePath, string $status = 'published', string $approvalStatus = 'approved', ?int $userArtistId = null): int
     {
         $this->execute(
             'INSERT INTO events (artist_id, user_artist_id, title, slug, description, event_date, location, image_path, status, approval_status) VALUES (:artist_id, :user_artist_id, :title, :slug, :description, :event_date, :location, :image_path, :status, :approval_status)',
@@ -73,7 +73,7 @@ final class Event extends BaseModel
         return (int) $this->db->lastInsertId();
     }
 
-    public function update(int $id, int $artistId, string $title, string $slug, string $description, string $eventDate, string $location, ?string $imagePath, string $status): bool
+    public function update(int $id, ?int $artistId, string $title, string $slug, string $description, string $eventDate, string $location, ?string $imagePath, string $status): bool
     {
         return $this->execute(
             'UPDATE events SET artist_id = :artist_id, title = :title, slug = :slug, description = :description, event_date = :event_date, location = :location, image_path = COALESCE(:image_path, image_path), status = :status WHERE id = :id',
@@ -130,3 +130,5 @@ final class Event extends BaseModel
             [':id' => $id, ':status' => 'rejected']
         );
     }
+}
+

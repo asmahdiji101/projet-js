@@ -88,6 +88,7 @@ final class Database
             email TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL,
             role TEXT NOT NULL DEFAULT 'user',
+            profile_picture_path TEXT DEFAULT NULL,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -102,7 +103,7 @@ final class Database
 
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            artist_id INTEGER NOT NULL,
+            artist_id INTEGER DEFAULT NULL,
             user_artist_id INTEGER DEFAULT NULL,
             title TEXT NOT NULL,
             slug TEXT NOT NULL UNIQUE,
@@ -180,8 +181,8 @@ final class Database
 
         $artistId = (int) $pdo->lastInsertId();
 
-        $pdo->exec("INSERT INTO events (artist_id, title, slug, description, event_date, location, image_path, status) VALUES
-            ($artistId, 'Neon Night Live', 'neon-night-live', 'A glowing mixed-media night event.', '2026-05-10 19:30:00', 'Paris Hall 1', NULL, 'published')");
+        $pdo->exec("INSERT INTO events (artist_id, title, slug, description, event_date, location, image_path, status, approval_status) VALUES
+            ($artistId, 'Neon Night Live', 'neon-night-live', 'A glowing mixed-media night event.', '2026-05-10 19:30:00', 'Paris Hall 1', NULL, 'published', 'approved')");
 
         $eventId = (int) $pdo->lastInsertId();
 

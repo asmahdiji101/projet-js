@@ -133,6 +133,9 @@ switch ($uri) {
     case '/events/edit':
         (new EventController())->edit();
         break;
+    case '/events/artist-events':
+        (new EventController())->artistEvents();
+        break;
     case '/artists':
         (new ArtistController())->index();
         break;

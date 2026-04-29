@@ -51,6 +51,7 @@
             </div>
         <?php endif; ?>
         <a class="button button-primary" href="/events/create" style="margin-top:1rem;">Submit new event</a>
+        <a class="button button-secondary" href="/events/artist-events" style="margin-top:1rem;">View all my event statuses</a>
     <?php else: ?>
         <div class="section-heading" style="margin-top:2rem;">
             <span>Bookings</span>

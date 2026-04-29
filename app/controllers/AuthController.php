@@ -71,6 +71,52 @@ final class AuthController extends Controller
             return;
         }
 
+        $role = ($accountType === 'artist') ? 'artist' : 'user';
+
+        // Handle profile picture upload
+        $profilePicturePath = null;
+        $uploadDir = dirname(__DIR__) . '/public/uploads/profiles/';
+
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0755, true);
+        }
+
+        // Profile picture is required for artists, optional for participants
+        $isArtist = ($role === 'artist');
+        $hasProfilePictureFile = isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK;
+
+        if ($isArtist && !$hasProfilePictureFile) {
+            $this->render('auth/register', [
+                'error' => 'Profile picture is required for artists.',
+            ]);
+            return;
+        }
+
+        if ($hasProfilePictureFile) {
+            $file = $_FILES['profile_picture'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            if (!in_array($ext, $allowedExts, true)) {
+                $this->render('auth/register', [
+                    'error' => 'Only image files (JPG, PNG, GIF, WebP) are allowed.',
+                ]);
+                return;
+            }
+
+            $filename = uniqid(str_replace(' ', '-', strtolower($fullName)) . '-', true) . '.' . $ext;
+            $target = $uploadDir . $filename;
+
+            if (!move_uploaded_file($file['tmp_name'], $target)) {
+                $this->render('auth/register', [
+                    'error' => 'Failed to upload profile picture.',
+                ]);
+                return;
+            }
+
+            $profilePicturePath = '/uploads/profiles/' . $filename;
+        }
+
         $userModel = new User();
 
         if ($userModel->findByEmail($email) !== null) {
@@ -83,7 +129,7 @@ final class AuthController extends Controller
 
         $role = ($accountType === 'artist') ? 'artist' : 'user';
 
-        $userId = $userModel->create($fullName, $email, password_hash($password, PASSWORD_DEFAULT), $role);
+        $userId = $userModel->create($fullName, $email, password_hash($password, PASSWORD_DEFAULT), $role, $profilePicturePath);
 
         $_SESSION['user'] = [
             'id' => $userId,
