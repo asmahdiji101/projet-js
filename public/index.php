@@ -18,6 +18,12 @@ $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $uri = rtrim($uri, '/') ?: '/';
 $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
+// Dynamic route: event detail /events/{id}
+if ($method === 'GET' && preg_match('#^/events/(\d+)$#', $uri, $m)) {
+    (new EventController())->show((int)$m[1]);
+    return;
+}
+
 if ($method === 'POST' && $uri === '/login') {
     (new AuthController())->login();
     return;
@@ -105,6 +111,11 @@ if ($method === 'POST' && $uri === '/admin/event/approve') {
 
 if ($method === 'POST' && $uri === '/admin/event/reject') {
     (new AdminMessagingController())->rejectEvent();
+    return;
+}
+
+if ($method === 'GET' && $uri === '/notifications') {
+    (new App\Controllers\NotificationController())->index();
     return;
 }
 

@@ -39,6 +39,7 @@ final class AuthController extends Controller
             'full_name' => $user['full_name'],
             'email' => $user['email'],
             'role' => $user['role'],
+            'profile_picture_path' => $user['profile_picture_path'] ?? null,
         ];
 
         $redirectTo = $_SESSION['intended'] ?? '/dashboard';
@@ -94,6 +95,14 @@ final class AuthController extends Controller
 
         if ($hasProfilePictureFile) {
             $file = $_FILES['profile_picture'];
+            // Limit profile picture to 1MB
+            if (isset($file['size']) && $file['size'] > 1 * 1024 * 1024) {
+                $this->render('auth/register', [
+                    'error' => 'Profile picture must be <= 1MB.',
+                ]);
+                return;
+            }
+
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
@@ -107,7 +116,7 @@ final class AuthController extends Controller
             $filename = uniqid(str_replace(' ', '-', strtolower($fullName)) . '-', true) . '.' . $ext;
             $target = $uploadDir . $filename;
 
-            if (!move_uploaded_file($file['tmp_name'], $target)) {
+            if (!store_uploaded_image($file, $target, 300, 300)) {
                 $this->render('auth/register', [
                     'error' => 'Failed to upload profile picture.',
                 ]);
@@ -136,6 +145,7 @@ final class AuthController extends Controller
             'full_name' => $fullName,
             'email' => $email,
             'role' => $role,
+            'profile_picture_path' => $profilePicturePath,
         ];
 
         $redirectTo = $_SESSION['intended'] ?? '/dashboard';

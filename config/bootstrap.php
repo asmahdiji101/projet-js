@@ -82,3 +82,82 @@ function get_markup_price(float $price): float
     return round($price * 1.1, 2);
 }
 
+function store_uploaded_image(array $file, string $destinationPath, int $maxWidth, int $maxHeight): bool
+{
+    if (!isset($file['tmp_name']) || !is_string($file['tmp_name']) || $file['tmp_name'] === '' || !is_file($file['tmp_name'])) {
+        return false;
+    }
+
+    $imageInfo = @getimagesize($file['tmp_name']);
+
+    if ($imageInfo === false) {
+        return move_uploaded_file($file['tmp_name'], $destinationPath);
+    }
+
+    [$width, $height, $type] = $imageInfo;
+
+    if ($width <= $maxWidth && $height <= $maxHeight) {
+        return move_uploaded_file($file['tmp_name'], $destinationPath);
+    }
+
+    if (!extension_loaded('gd')) {
+        return move_uploaded_file($file['tmp_name'], $destinationPath);
+    }
+
+    switch ($type) {
+        case IMAGETYPE_JPEG:
+            $sourceImage = imagecreatefromjpeg($file['tmp_name']);
+            break;
+        case IMAGETYPE_PNG:
+            $sourceImage = imagecreatefrompng($file['tmp_name']);
+            break;
+        case IMAGETYPE_GIF:
+            $sourceImage = imagecreatefromgif($file['tmp_name']);
+            break;
+        case IMAGETYPE_WEBP:
+            if (!function_exists('imagecreatefromwebp') || !function_exists('imagewebp')) {
+                return move_uploaded_file($file['tmp_name'], $destinationPath);
+            }
+
+            $sourceImage = imagecreatefromwebp($file['tmp_name']);
+            break;
+        default:
+            return move_uploaded_file($file['tmp_name'], $destinationPath);
+    }
+
+    if ($sourceImage === false) {
+        return false;
+    }
+
+    $ratio = min($maxWidth / $width, $maxHeight / $height, 1);
+    $targetWidth = max(1, (int) round($width * $ratio));
+    $targetHeight = max(1, (int) round($height * $ratio));
+    $targetImage = imagecreatetruecolor($targetWidth, $targetHeight);
+
+    if ($type === IMAGETYPE_PNG || $type === IMAGETYPE_GIF || $type === IMAGETYPE_WEBP) {
+        imagealphablending($targetImage, false);
+        imagesavealpha($targetImage, true);
+        $transparent = imagecolorallocatealpha($targetImage, 0, 0, 0, 127);
+        imagefilledrectangle($targetImage, 0, 0, $targetWidth, $targetHeight, $transparent);
+    }
+
+    imagecopyresampled($targetImage, $sourceImage, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height);
+
+    $saved = match ($type) {
+        IMAGETYPE_JPEG => imagejpeg($targetImage, $destinationPath, 85),
+        IMAGETYPE_PNG => imagepng($targetImage, $destinationPath, 6),
+        IMAGETYPE_GIF => imagegif($targetImage, $destinationPath),
+        IMAGETYPE_WEBP => imagewebp($targetImage, $destinationPath, 85),
+        default => false,
+    };
+
+    imagedestroy($sourceImage);
+    imagedestroy($targetImage);
+
+    if ($saved) {
+        @unlink($file['tmp_name']);
+    }
+
+    return $saved;
+}
+

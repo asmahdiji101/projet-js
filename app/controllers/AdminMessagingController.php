@@ -121,9 +121,11 @@ final class AdminMessagingController extends Controller
         }
 
         (new Event())->approve($id);
+        $artistId = isset($event['artist_id']) && $event['artist_id'] ? (int) $event['artist_id'] : null;
+
         (new Event())->update(
             $id,
-            (int) $event['artist_id'],
+            $artistId,
             $event['title'],
             $event['slug'],
             $event['description'],

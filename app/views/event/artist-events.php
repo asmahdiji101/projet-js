@@ -31,7 +31,11 @@
                         <?= $statusLabel ?>
                     </div>
                     
-                    <p class="event-description"><?= e(mb_strimwidth($event['description'], 0, 100, '...')) ?></p>
+                    <?php
+                        $desc = $event['description'] ?? '';
+                        $short = mb_strlen($desc) > 100 ? mb_substr($desc, 0, 100) . '...' : $desc;
+                    ?>
+                    <p class="event-description"><?= e($short) ?></p>
                     
                     <div class="event-actions">
                         <a href="/events/<?= (int) $event['id'] ?>" class="button button-secondary">Voir</a>

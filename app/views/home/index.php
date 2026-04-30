@@ -35,7 +35,7 @@
         <?php else: ?>
             <?php foreach ($events as $event): ?>
                 <article class="card">
-                    <h3><?= e($event['title']) ?></h3>
+                    <h3><a href="/events/<?= (int)$event['id'] ?>"><?= e($event['title']) ?></a></h3>
                     <?php if (!empty($event['image_path'])): ?>
                         <img src="<?= e($event['image_path']) ?>" alt="<?= e($event['title']) ?>" style="max-width:100%;border-radius:8px;">
                     <?php endif; ?>

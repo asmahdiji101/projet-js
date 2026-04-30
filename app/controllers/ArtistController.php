@@ -60,7 +60,7 @@ final class ArtistController extends Controller
                 return;
             }
 
-            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+            if (!store_uploaded_image($_FILES['image'], $target, 800, 800)) {
                 $this->render('artist/create', ['error' => 'Failed to move uploaded file.']);
                 return;
             }
@@ -131,7 +131,7 @@ final class ArtistController extends Controller
                 return;
             }
 
-            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+            if (!store_uploaded_image($_FILES['image'], $target, 800, 800)) {
                 $this->render('artist/edit', ['artist' => $artist, 'error' => 'Failed to move uploaded file.']);
                 return;
             }

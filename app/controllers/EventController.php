@@ -139,6 +139,15 @@ final class EventController extends Controller
         if (strlen($eventDate) === 16) {
             $eventDate .= ':00';
         }
+
+        // Ensure event date is in the future
+        $ts = strtotime($eventDate);
+        if ($ts === false || $ts <= time()) {
+            $renderView = $isArtist ? 'event/artist-create' : 'event/create';
+            $context = $isArtist ? ['error' => 'Event date must be in the future.'] : ['artists' => (new Artist())->all(), 'error' => 'Event date must be in the future.'];
+            $this->render($renderView, $context);
+            return;
+        }
         $imagePath = null;
 
         if (!empty($_FILES['image']['tmp_name'])) {
@@ -151,6 +160,14 @@ final class EventController extends Controller
                 return;
             }
 
+            // Limit event image size to 2MB
+            if (isset($_FILES['image']['size']) && $_FILES['image']['size'] > 2 * 1024 * 1024) {
+                $renderView = $isArtist ? 'event/artist-create' : 'event/create';
+                $context = $isArtist ? ['error' => 'Event image must be <= 2MB.'] : ['artists' => (new Artist())->all(), 'error' => 'Event image must be <= 2MB.'];
+                $this->render($renderView, $context);
+                return;
+            }
+
             $uploadDir = PUBLIC_PATH . '/uploads/events/';
             if (!is_dir($uploadDir)) {
                 @mkdir($uploadDir, 0755, true);
@@ -159,7 +176,7 @@ final class EventController extends Controller
             $filename = $slug . '-' . time() . '.' . $ext;
             $target = $uploadDir . $filename;
 
-            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+            if (!store_uploaded_image($_FILES['image'], $target, 1600, 900)) {
                 $renderView = $isArtist ? 'event/artist-create' : 'event/create';
                 $context = $isArtist ? ['error' => 'Failed to move file.'] : ['artists' => (new Artist())->all(), 'error' => 'Failed to move file.'];
                 $this->render($renderView, $context);
@@ -246,7 +263,7 @@ final class EventController extends Controller
             $filename = $slug . '-' . time() . '.' . $ext;
             $target = $uploadDir . $filename;
 
-            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+            if (!store_uploaded_image($_FILES['image'], $target, 1600, 900)) {
                 $this->render('event/edit', [
                     'event' => $event,
                     'artists' => (new Artist())->all(),
@@ -311,6 +328,32 @@ final class EventController extends Controller
 
             $this->render('event/artist-events', [
                 'events' => $events,
+            ]);
+        }
+
+        public function show(int $id = 0): void
+        {
+            $eventId = $id ?: (int) ($_GET['id'] ?? 0);
+            $event = (new Event())->findById($eventId);
+
+            if ($event === null) {
+                http_response_code(404);
+                echo 'Event not found';
+                return;
+            }
+
+            // Only show published approved events to public users
+            if ($event['approval_status'] !== 'approved' && !is_admin() && !(isset($_SESSION['user']) && $_SESSION['user']['role'] === 'artist' && (int) $_SESSION['user']['id'] === (int) $event['user_artist_id'])) {
+                http_response_code(403);
+                echo 'Forbidden';
+                return;
+            }
+
+            $tickets = (new Ticket())->forEvent($eventId);
+
+            $this->render('event/show', [
+                'event' => $event,
+                'tickets' => $tickets,
             ]);
         }
 }

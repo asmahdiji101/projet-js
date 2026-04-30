@@ -48,4 +48,12 @@ final class Notification extends BaseModel
             [':id' => $id]
         );
     }
+
+    public function markAllAsRead(int $userId): bool
+    {
+        return $this->execute(
+            'UPDATE notifications SET is_read = 1 WHERE user_id = :user_id AND is_read = 0',
+            [':user_id' => $userId]
+        );
+    }
 }
