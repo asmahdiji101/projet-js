@@ -119,6 +119,11 @@ if ($method === 'GET' && $uri === '/notifications') {
     return;
 }
 
+if ($method === 'GET' && $uri === '/admin/stats/live') {
+    (new AdminController())->liveStats();
+    return;
+}
+
 switch ($uri) {
     case '/':
         (new HomeController())->index();

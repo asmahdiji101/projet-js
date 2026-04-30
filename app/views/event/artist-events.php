@@ -33,7 +33,7 @@
                     
                     <?php
                         $desc = $event['description'] ?? '';
-                        $short = mb_strlen($desc) > 100 ? mb_substr($desc, 0, 100) . '...' : $desc;
+                        $short = strlen($desc) > 100 ? substr($desc, 0, 100) . '...' : $desc;
                     ?>
                     <p class="event-description"><?= e($short) ?></p>
                     

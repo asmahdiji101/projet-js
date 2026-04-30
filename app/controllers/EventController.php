@@ -7,6 +7,8 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Event;
 use App\Models\Artist;
+use App\Models\Notification;
+use App\Models\User;
 use App\Models\Ticket;
 
 final class EventController extends Controller
@@ -188,6 +190,18 @@ final class EventController extends Controller
 
         $eventModel = new Event();
         $eventId = $eventModel->create($artistId, $title, $slug, $description, $eventDate, $location, $imagePath, $status, $approvalStatus, $userArtistId);
+
+        if ($isArtist) {
+            foreach ((new User())->idsByRole('admin') as $adminId) {
+                (new Notification())->create(
+                    $adminId,
+                    'event_pending',
+                    'New event waiting for approval',
+                    'Artist "' . $_SESSION['user']['full_name'] . '" submitted "' . $title . '".',
+                    $eventId
+                );
+            }
+        }
 
         if ($ticketName !== '' && $ticketPrice > 0 && $ticketQuantity > 0) {
             (new Ticket())->create($eventId, $ticketName, $ticketPrice, $ticketQuantity);

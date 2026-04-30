@@ -41,6 +41,16 @@ final class ContactMessage extends BaseModel
         );
     }
 
+    public function countPending(): int
+    {
+        $row = $this->fetchOne(
+            'SELECT COUNT(*) AS count FROM contact_messages WHERE status = :status',
+            [':status' => 'pending']
+        );
+
+        return (int) ($row['count'] ?? 0);
+    }
+
     public function bySender(int $senderId): array
     {
         return $this->fetchAll(

@@ -32,4 +32,24 @@ final class User extends BaseModel
 
         return (int) $this->db->lastInsertId();
     }
+
+    public function idsByRole(string $role): array
+    {
+        $rows = $this->fetchAll(
+            'SELECT id FROM users WHERE role = :role',
+            [':role' => $role]
+        );
+
+        return array_map(static fn (array $row): int => (int) $row['id'], $rows);
+    }
+
+    public function idsNotRole(string $role): array
+    {
+        $rows = $this->fetchAll(
+            'SELECT id FROM users WHERE role <> :role',
+            [':role' => $role]
+        );
+
+        return array_map(static fn (array $row): int => (int) $row['id'], $rows);
+    }
 }

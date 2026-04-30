@@ -40,12 +40,7 @@
                 <?php endif; ?>
                 <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?">Déconnexion</a>
 
-                <?php
-                    $avatar = $_SESSION['user']['profile_picture_path'] ?? null;
-                    if (empty($avatar)) {
-                            $avatar = '/images/default-avatar.svg';
-                        }
-                ?>
+                <?php $avatar = $_SESSION['user']['profile_picture_path'] ?? '/images/default-avatar.svg'; ?>
                 <img src="<?= e($avatar) ?>" alt="avatar" class="nav-avatar">
             <?php else: ?>
                 <a href="/login">Connexion</a>

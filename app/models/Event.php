@@ -9,9 +9,10 @@ final class Event extends BaseModel
     public function allPublished(): array
     {
         return $this->fetchAll(
-            'SELECT events.*, artists.name AS artist_name
+            'SELECT events.*, COALESCE(artists.name, users.full_name, "Artist") AS artist_name
              FROM events
-             INNER JOIN artists ON artists.id = events.artist_id
+             LEFT JOIN artists ON artists.id = events.artist_id
+             LEFT JOIN users ON users.id = events.user_artist_id
              WHERE events.status = :status AND events.approval_status = :approval
              ORDER BY events.event_date ASC',
             [':status' => 'published', ':approval' => 'approved']
@@ -21,9 +22,10 @@ final class Event extends BaseModel
     public function findPublishedById(int $id): ?array
     {
         return $this->fetchOne(
-            'SELECT events.*, artists.name AS artist_name
+            'SELECT events.*, COALESCE(artists.name, users.full_name, "Artist") AS artist_name
              FROM events
-             INNER JOIN artists ON artists.id = events.artist_id
+             LEFT JOIN artists ON artists.id = events.artist_id
+             LEFT JOIN users ON users.id = events.user_artist_id
              WHERE events.id = :id AND events.status = :status
              LIMIT 1',
             [':id' => $id, ':status' => 'published']
@@ -40,9 +42,10 @@ final class Event extends BaseModel
     public function all(): array
     {
         return $this->fetchAll(
-            'SELECT events.*, artists.name AS artist_name
+            'SELECT events.*, COALESCE(artists.name, users.full_name, "Artist") AS artist_name
              FROM events
-             INNER JOIN artists ON artists.id = events.artist_id
+             LEFT JOIN artists ON artists.id = events.artist_id
+             LEFT JOIN users ON users.id = events.user_artist_id
              ORDER BY events.created_at DESC'
         );
     }
@@ -113,6 +116,16 @@ final class Event extends BaseModel
              ORDER BY events.created_at DESC',
             [':status' => 'pending']
         );
+    }
+
+    public function countPendingApproval(): int
+    {
+        $row = $this->fetchOne(
+            'SELECT COUNT(*) AS count FROM events WHERE approval_status = :status',
+            [':status' => 'pending']
+        );
+
+        return (int) ($row['count'] ?? 0);
     }
 
     public function approve(int $id): bool

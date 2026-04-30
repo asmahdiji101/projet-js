@@ -34,14 +34,15 @@
             <div class="auth-card"><p>No events available yet.</p></div>
         <?php else: ?>
             <?php foreach ($events as $event): ?>
-                <article class="card">
-                    <h3><a href="/events/<?= (int)$event['id'] ?>"><?= e($event['title']) ?></a></h3>
+                <a class="card event-card-link" href="/events/<?= (int)$event['id'] ?>">
                     <?php if (!empty($event['image_path'])): ?>
-                        <img src="<?= e($event['image_path']) ?>" alt="<?= e($event['title']) ?>" style="max-width:100%;border-radius:8px;">
+                        <img src="<?= e($event['image_path']) ?>" alt="<?= e($event['title']) ?>" class="event-card-image">
                     <?php endif; ?>
+                    <span class="eyebrow"><?= e($event['artist_name'] ?? 'Event') ?></span>
+                    <h3><?= e($event['title']) ?></h3>
                     <p><?= e($event['description']) ?></p>
                     <small><?= e($event['event_date']) ?> — <?= e($event['location']) ?></small>
-                </article>
+                </a>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>

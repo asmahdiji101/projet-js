@@ -6,7 +6,7 @@
         <div class="alert alert-error"><?= e($error) ?></div>
     <?php endif; ?>
 
-    <div style="background:#f5f5f5;padding:1rem;border-radius:4px;margin:1rem 0;">
+    <div class="admin-surface">
         <p><strong>From:</strong> <?= e($message['full_name']) ?> (<?= e($message['email']) ?>)</p>
         <p><strong>Type:</strong> <?= e(ucfirst($message['sender_type'])) ?></p>
         <p><strong>Subject:</strong> <?= e($message['subject']) ?></p>
@@ -16,7 +16,7 @@
     </div>
 
     <?php if (!empty($message['admin_reply'])): ?>
-        <div style="background:#e8f5e9;padding:1rem;border-radius:4px;margin:1rem 0;">
+        <div class="admin-surface admin-surface-reply">
             <p><strong>Your reply:</strong></p>
             <p><?= nl2br(e($message['admin_reply'])) ?></p>
             <small><?= e($message['replied_at']) ?></small>

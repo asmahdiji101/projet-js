@@ -11,7 +11,7 @@
     <?php else: ?>
         <div class="cart-items">
             <?php foreach ($messages as $msg): ?>
-                <article class="cart-item">
+                <article class="cart-item admin-message-item">
                     <div>
                         <h3><?= e($msg['subject']) ?></h3>
                         <p><strong>From:</strong> <?= e($msg['full_name']) ?> (<?= e($msg['email']) ?>) — <?= e($msg['sender_type']) ?></p>
@@ -23,7 +23,7 @@
                             <p style="color:orange;"><strong>Pending</strong></p>
                         <?php endif; ?>
                     </div>
-                    <div class="hero-actions" style="margin-top:0;">
+                    <div class="hero-actions admin-message-actions">
                         <a class="button button-primary" href="/admin/message?id=<?= e((string) $msg['id']) ?>">View & Reply</a>
                     </div>
                 </article>

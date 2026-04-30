@@ -8,6 +8,7 @@ use App\Core\Controller;
 use App\Models\ContactMessage;
 use App\Models\Event;
 use App\Models\Notification;
+use App\Models\User;
 
 final class AdminMessagingController extends Controller
 {
@@ -142,6 +143,16 @@ final class AdminMessagingController extends Controller
                 'event_approved',
                 'Your event was approved!',
                 'Event "' . $event['title'] . '" is now live. Prices have 10% markup applied.',
+                $id
+            );
+        }
+
+        foreach ((new User())->idsNotRole('admin') as $recipientId) {
+            (new Notification())->create(
+                $recipientId,
+                'new_event',
+                'New event available',
+                '"' . $event['title'] . '" is now live on NeonPass.',
                 $id
             );
         }
