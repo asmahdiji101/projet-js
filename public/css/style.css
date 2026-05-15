@@ -1181,11 +1181,8 @@ main {
         grid-template-columns: 240px minmax(0, 1fr);
     }
 
-    /* keep right sidebar aligned to the right until smaller breakpoints */
     .home-sidebar-right {
-        position: sticky;
-        top: 6.5rem;
-        align-self: start;
+        position: static;
     }
 }
 
