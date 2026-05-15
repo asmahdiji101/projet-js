@@ -120,6 +120,26 @@ main {
     padding: 1rem clamp(0.75rem, 1.5vw, 1.25rem);
 }
 
+.app-shell {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 1rem;
+    width: 100%;
+    min-height: calc(100vh - 6.5rem);
+}
+
+.app-sidebar {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+    max-height: calc(100vh - 7.5rem);
+    overflow: auto;
+}
+
+.app-main {
+    min-width: 0;
+}
+
 .home-shell {
     display: grid;
     grid-template-columns: minmax(220px, 0.95fr) minmax(0, 2.1fr) minmax(220px, 0.85fr);
@@ -150,6 +170,13 @@ main {
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 0.25rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.home-center::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 .home-panel {
@@ -313,7 +340,7 @@ main {
 .home-feed-card {
     display: grid;
     gap: 1rem;
-    padding: 1rem;
+    padding: 0.75rem;
     border-radius: 1.8rem;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94));
     border: 1px solid var(--border);
@@ -338,7 +365,7 @@ main {
 .home-feed-media img,
 .home-feed-placeholder {
     width: 100%;
-    height: 520px;
+    height: 320px;
     object-fit: cover;
     border-radius: 1.4rem;
     background: linear-gradient(160deg, rgba(77, 225, 193, 0.2), rgba(255, 138, 61, 0.2));
@@ -348,7 +375,7 @@ main {
     display: grid;
     place-items: center;
     color: #fff;
-    font-size: 4rem;
+    font-size: 3rem;
     font-weight: 800;
     letter-spacing: 0.12em;
 }
@@ -360,7 +387,7 @@ main {
 
 .home-feed-title-row h3 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
 }
 
 .home-feed-body p {

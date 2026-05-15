@@ -44,6 +44,7 @@ final class HomeController extends Controller
             'categories' => Event::CATEGORIES,
             'homeTrends' => $homeTrends,
             'homePlaces' => $homePlaces,
+            'layoutSidebar' => false,
         ]);
     }
 }
