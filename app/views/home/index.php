@@ -69,7 +69,7 @@
             </form>
         </div>
 
-        <div class="home-categories">
+        <div class="home-categories" aria-label="Event types">
             <?php foreach ($categories as $key => $label): ?>
                 <a class="home-category-card <?= ($filters['category'] ?? '') === $key ? 'is-active' : '' ?>" href="/?category=<?= e($key) ?>">
                     <img class="home-category-icon-image" src="/images/event-types/<?= e($key) ?>.svg" alt="<?= e($label) ?>">
@@ -128,7 +128,7 @@
             </div>
 
             <div class="home-side-list">
-                <?php foreach (array_slice($events, 0, 3) as $event): ?>
+                <?php foreach ($homeTrends as $event): ?>
                     <a class="home-side-card" href="/events/<?= (int) $event['id'] ?>">
                         <strong><?= e($event['title']) ?></strong>
                         <small><?= e($event['location']) ?></small>
@@ -144,7 +144,7 @@
             </div>
 
             <div class="home-side-list">
-                <?php foreach (array_slice(array_values(array_filter(array_unique(array_map(static fn (array $event): string => (string) ($event['location'] ?? ''), $events)))), 0, 5) as $place): ?>
+                <?php foreach ($homePlaces as $place): ?>
                     <div class="home-place-card">
                         <strong><?= e($place) ?></strong>
                         <small>Popular venue</small>
