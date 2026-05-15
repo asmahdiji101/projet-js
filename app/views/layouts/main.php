@@ -15,26 +15,6 @@
                 <p>Events, tickets and immersive experiences</p>
             </div>
         </div>
-        <nav class="topbar-actions">
-            <?php if (is_authenticated()): ?>
-                <a href="/notifications" class="topbar-icon-link" aria-label="Notifications">
-                    <span class="topbar-icon">🔔</span>
-                    <?php $unread = (new \App\Models\Notification())->unreadCount((int) ($_SESSION['user']['id'] ?? 0)); ?>
-                    <?php if ($unread > 0): ?>
-                        <span class="notif-badge"><?= e((string) $unread) ?></span>
-                    <?php endif; ?>
-                </a>
-                <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?" class="topbar-icon-link" aria-label="Déconnexion">
-                    <span class="topbar-icon">⎋</span>
-                </a>
-
-                <?php $avatar = avatar_url($_SESSION['user']['profile_picture_path'] ?? null); ?>
-                <img src="<?= e($avatar) ?>" alt="avatar" class="nav-avatar" onerror="this.src='/images/default-avatar.svg'">
-            <?php else: ?>
-                <a href="/login" class="topbar-action">Connexion</a>
-                <a href="/register" class="topbar-action topbar-action-primary">Inscription</a>
-            <?php endif; ?>
-        </nav>
     </header>
 
     <main>
