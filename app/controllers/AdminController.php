@@ -39,6 +39,41 @@ final class AdminController extends Controller
         ]);
     }
 
+    public function bookings(): void
+    {
+        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? 'user') !== 'admin') {
+            http_response_code(403);
+            echo '<h1>403</h1><p>Forbidden.</p>';
+
+            return;
+        }
+
+        $bookings = (new Booking())->allWithDetails();
+
+        $this->render('admin/bookings', [
+            'bookings' => $bookings,
+        ]);
+    }
+
+    public function revenue(): void
+    {
+        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? 'user') !== 'admin') {
+            http_response_code(403);
+            echo '<h1>403</h1><p>Forbidden.</p>';
+
+            return;
+        }
+
+        $bookingModel = new Booking();
+
+        $this->render('admin/revenue', [
+            'totalRevenue' => $bookingModel->totalRevenue(),
+            'byCategory' => $bookingModel->revenueByCategory(),
+            'byLocation' => $bookingModel->revenueByLocation(),
+            'totalBookings' => $bookingModel->countAll(),
+        ]);
+    }
+
     public function liveStats(): void
     {
         if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? 'user') !== 'admin') {

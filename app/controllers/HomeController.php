@@ -11,10 +11,19 @@ final class HomeController extends Controller
 {
     public function index(): void
     {
-        $events = (new Event())->allPublished();
+        $filters = [
+            'query' => trim((string) ($_GET['q'] ?? '')),
+            'city' => trim((string) ($_GET['city'] ?? '')),
+            'date' => trim((string) ($_GET['date'] ?? '')),
+            'category' => trim((string) ($_GET['category'] ?? '')),
+        ];
+
+        $events = (new Event())->searchPublished($filters);
 
         $this->render('home/index', [
             'events' => $events,
+            'filters' => $filters,
+            'categories' => Event::CATEGORIES,
         ]);
     }
 }

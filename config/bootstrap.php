@@ -82,6 +82,29 @@ function get_markup_price(float $price): float
     return round($price * 1.1, 2);
 }
 
+function avatar_url(?string $path = null): string
+{
+    $defaultAvatar = '/images/default-avatar.svg';
+
+    if ($path === null || $path === '') {
+        return $defaultAvatar;
+    }
+
+    $normalizedPath = $path;
+
+    if ($normalizedPath[0] !== '/') {
+        $normalizedPath = '/' . ltrim($normalizedPath, '/');
+    }
+
+    $filesystemPath = PUBLIC_PATH . $normalizedPath;
+
+    if (!is_file($filesystemPath)) {
+        return $defaultAvatar;
+    }
+
+    return $normalizedPath;
+}
+
 function store_uploaded_image(array $file, string $destinationPath, int $maxWidth, int $maxHeight): bool
 {
     if (!isset($file['tmp_name']) || !is_string($file['tmp_name']) || $file['tmp_name'] === '' || !is_file($file['tmp_name'])) {

@@ -3,15 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>NeonPass | Event Ticketing</title>
+    <title>AIO Events | Event Ticketing</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <header class="topbar">
         <div class="brand">
-            <span class="brand-mark">NP</span>
+            <img src="/images/logo.svg" alt="AIO Events" class="brand-logo">
             <div>
-                <strong>NeonPass</strong>
+                <strong>AIO Events</strong>
                 <p>Events, tickets and immersive experiences</p>
             </div>
         </div>
@@ -33,6 +33,7 @@
                     <a href="/events/artist-events">Mes événements</a>
                 <?php endif; ?>
                 <a href="/dashboard">Mon compte</a>
+                <a href="/account/edit">Modifier le compte</a>
                 <?php if (is_admin()): ?>
                     <a href="/events/create">Créer un événement</a>
                     <a href="/artists">Artistes</a>
@@ -40,7 +41,7 @@
                 <?php endif; ?>
                 <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?">Déconnexion</a>
 
-                <?php $avatar = $_SESSION['user']['profile_picture_path'] ?? '/images/default-avatar.svg'; ?>
+                <?php $avatar = avatar_url($_SESSION['user']['profile_picture_path'] ?? null); ?>
                 <img src="<?= e($avatar) ?>" alt="avatar" class="nav-avatar">
             <?php else: ?>
                 <a href="/login">Connexion</a>

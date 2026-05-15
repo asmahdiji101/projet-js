@@ -1,4 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-open-notification]').forEach((element) => {
+        element.addEventListener('click', (event) => {
+            const href = element.getAttribute('href');
+            if (!href) {
+                event.preventDefault();
+                return;
+            }
+
+            // Let the anchor navigate naturally, but keep this hook for future AJAX enhancement.
+            window.location.href = href;
+        });
+    });
+
     document.querySelectorAll('[data-confirm]').forEach((element) => {
         element.addEventListener('click', (event) => {
             event.preventDefault();

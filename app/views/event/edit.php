@@ -26,6 +26,15 @@
         </label>
 
         <label>
+            Type of event
+            <select name="category" required>
+                <?php foreach ($categories as $key => $label): ?>
+                    <option value="<?= e($key) ?>" <?= ($event['category'] ?? 'concert') === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+
+        <label>
             Title
             <input type="text" name="title" value="<?= e($event['title']) ?>" required>
         </label>
@@ -41,7 +50,7 @@
         </label>
 
         <label>
-            Location
+            Ville / location
             <input type="text" name="location" value="<?= e($event['location']) ?>" required>
         </label>
 

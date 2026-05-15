@@ -27,4 +27,26 @@ final class NotificationController extends Controller
             'notifications' => $notifications,
         ]);
     }
+
+    public function open(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            redirect('/login');
+            return;
+        }
+
+        $notificationId = (int) ($_GET['id'] ?? 0);
+        $userId = (int) $_SESSION['user']['id'];
+        $notificationModel = new Notification();
+        $notification = $notificationModel->findByIdAndUser($notificationId, $userId);
+
+        if ($notification === null) {
+            redirect('/notifications');
+            return;
+        }
+
+        $notificationModel->markAsRead($notificationId);
+
+        redirect($notificationModel->targetUrl($notification));
+    }
 }

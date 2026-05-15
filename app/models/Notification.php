@@ -31,6 +31,27 @@ final class Notification extends BaseModel
         );
     }
 
+    public function findByIdAndUser(int $id, int $userId): ?array
+    {
+        return $this->fetchOne(
+            'SELECT * FROM notifications WHERE id = :id AND user_id = :user_id LIMIT 1',
+            [':id' => $id, ':user_id' => $userId]
+        );
+    }
+
+    public function targetUrl(array $notification): string
+    {
+        $type = (string) ($notification['type'] ?? '');
+        $relatedId = (int) ($notification['related_id'] ?? 0);
+
+        return match ($type) {
+            'new_event', 'event_approved', 'event_rejected', 'event_pending' => $relatedId > 0 ? '/events/' . $relatedId : '/events',
+            'contact_message' => $relatedId > 0 ? '/admin/message?id=' . $relatedId : '/admin/messages',
+            'message_reply' => '/dashboard',
+            default => '/notifications',
+        };
+    }
+
     public function unreadCount(int $userId): int
     {
         $row = $this->fetchOne(

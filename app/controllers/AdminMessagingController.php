@@ -133,7 +133,8 @@ final class AdminMessagingController extends Controller
             $event['event_date'],
             $event['location'],
             null,
-            'published'
+            'published',
+            (string) ($event['category'] ?? 'concert')
         );
 
         // Send notification to artist if they created it

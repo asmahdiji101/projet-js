@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Booking;
+use App\Models\Artist;
 use App\Models\User;
 
 final class AuthController extends Controller
@@ -140,6 +141,17 @@ final class AuthController extends Controller
 
         $userId = $userModel->create($fullName, $email, password_hash($password, PASSWORD_DEFAULT), $role, $profilePicturePath);
 
+        if ($role === 'artist') {
+            $artistSlug = trim(strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $fullName)), '-');
+            (new Artist())->create(
+                $fullName,
+                $artistSlug,
+                'Artist account created from user registration.',
+                $profilePicturePath,
+                $userId
+            );
+        }
+
         $_SESSION['user'] = [
             'id' => $userId,
             'full_name' => $fullName,
@@ -152,6 +164,166 @@ final class AuthController extends Controller
         unset($_SESSION['intended']);
 
         redirect($redirectTo);
+    }
+
+    public function showEditProfile(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            redirect('/login');
+        }
+
+        $user = (new User())->findById((int) $_SESSION['user']['id']);
+
+        if ($user === null) {
+            redirect('/logout');
+        }
+
+        $artist = null;
+        if (($user['role'] ?? 'user') === 'artist') {
+            $artist = (new Artist())->findByUserId((int) $user['id']);
+        }
+
+        $this->render('auth/edit', [
+            'user' => $user,
+            'artist' => $artist,
+        ]);
+    }
+
+    public function updateProfile(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            redirect('/login');
+        }
+
+        $currentUser = (new User())->findById((int) $_SESSION['user']['id']);
+
+        if ($currentUser === null) {
+            redirect('/logout');
+        }
+
+        $fullName = trim($_POST['full_name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $newPassword = (string) ($_POST['new_password'] ?? '');
+        $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
+
+        if ($fullName === '' || $email === '') {
+            $artist = $currentUser['role'] === 'artist' ? (new Artist())->findByUserId((int) $currentUser['id']) : null;
+            $this->render('auth/edit', [
+                'user' => $currentUser,
+                'artist' => $artist,
+                'error' => 'Name and email are required.',
+            ]);
+
+            return;
+        }
+
+        $existing = (new User())->findByEmail($email);
+        if ($existing !== null && (int) $existing['id'] !== (int) $currentUser['id']) {
+            $artist = $currentUser['role'] === 'artist' ? (new Artist())->findByUserId((int) $currentUser['id']) : null;
+            $this->render('auth/edit', [
+                'user' => $currentUser,
+                'artist' => $artist,
+                'error' => 'Email already exists.',
+            ]);
+
+            return;
+        }
+
+        $profilePicturePath = $currentUser['profile_picture_path'] ?? null;
+        $hasProfilePictureFile = isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK;
+
+        if ($hasProfilePictureFile) {
+            $file = $_FILES['profile_picture'];
+
+            if (isset($file['size']) && $file['size'] > 1 * 1024 * 1024) {
+                $artist = $currentUser['role'] === 'artist' ? (new Artist())->findByUserId((int) $currentUser['id']) : null;
+                $this->render('auth/edit', [
+                    'user' => $currentUser,
+                    'artist' => $artist,
+                    'error' => 'Profile picture must be <= 1MB.',
+                ]);
+
+                return;
+            }
+
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            if (!in_array($ext, $allowedExts, true)) {
+                $artist = $currentUser['role'] === 'artist' ? (new Artist())->findByUserId((int) $currentUser['id']) : null;
+                $this->render('auth/edit', [
+                    'user' => $currentUser,
+                    'artist' => $artist,
+                    'error' => 'Only image files (JPG, PNG, GIF, WebP) are allowed.',
+                ]);
+
+                return;
+            }
+
+            $uploadDir = dirname(__DIR__) . '/public/uploads/profiles/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+
+            $filename = uniqid(str_replace(' ', '-', strtolower($fullName)) . '-', true) . '.' . $ext;
+            $target = $uploadDir . $filename;
+
+            if (!store_uploaded_image($file, $target, 300, 300)) {
+                $artist = $currentUser['role'] === 'artist' ? (new Artist())->findByUserId((int) $currentUser['id']) : null;
+                $this->render('auth/edit', [
+                    'user' => $currentUser,
+                    'artist' => $artist,
+                    'error' => 'Failed to upload profile picture.',
+                ]);
+
+                return;
+            }
+
+            $profilePicturePath = '/uploads/profiles/' . $filename;
+        }
+
+        $passwordHash = null;
+        if ($newPassword !== '' || $confirmPassword !== '') {
+            if ($newPassword === '' || $newPassword !== $confirmPassword) {
+                $artist = $currentUser['role'] === 'artist' ? (new Artist())->findByUserId((int) $currentUser['id']) : null;
+                $this->render('auth/edit', [
+                    'user' => $currentUser,
+                    'artist' => $artist,
+                    'error' => 'Passwords do not match.',
+                ]);
+
+                return;
+            }
+
+            $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        }
+
+        (new User())->updateProfile((int) $currentUser['id'], $fullName, $email, $passwordHash, $profilePicturePath);
+
+        if (($currentUser['role'] ?? 'user') === 'artist') {
+            $artistModel = new Artist();
+            $artist = $artistModel->findByUserId((int) $currentUser['id']);
+            $artistSlug = trim(strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $fullName)), '-');
+
+            if ($artist === null) {
+                $artistModel->create($fullName, $artistSlug, 'Artist account created from user registration.', $profilePicturePath, (int) $currentUser['id']);
+            } else {
+                $artistModel->update(
+                    (int) $artist['id'],
+                    $fullName,
+                    $artistSlug,
+                    (string) ($artist['description'] ?? 'Artist account created from user registration.'),
+                    $profilePicturePath,
+                    (int) $currentUser['id']
+                );
+            }
+        }
+
+        $_SESSION['user']['full_name'] = $fullName;
+        $_SESSION['user']['email'] = $email;
+        $_SESSION['user']['profile_picture_path'] = $profilePicturePath;
+
+        redirect('/dashboard');
     }
 
     public function dashboard(): void

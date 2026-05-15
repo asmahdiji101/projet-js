@@ -6,11 +6,12 @@
     <?php else: ?>
         <div class="cards notification-cards">
             <?php foreach ($notifications as $n): ?>
-                <article class="card notification-card <?= $n['is_read'] ? 'is-read' : 'is-unread' ?>">
+                <a class="card notification-card <?= $n['is_read'] ? 'is-read' : 'is-unread' ?>" href="/notifications/open?id=<?= e((string) $n['id']) ?>">
                     <h3><?= e($n['title']) ?></h3>
                     <p><?= e($n['message']) ?></p>
                     <small><?= e($n['created_at']) ?></small>
-                </article>
+                    <span class="notification-action">Open</span>
+                </a>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

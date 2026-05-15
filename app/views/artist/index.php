@@ -7,11 +7,17 @@
     <div class="cards">
         <?php foreach ($artists as $artist): ?>
             <article class="card">
+                <?php if (!empty($artist['user_email'])): ?>
+                    <span class="feed-pill">Artist account</span>
+                <?php endif; ?>
                 <h3><?= e($artist['name']) ?></h3>
                 <?php if (!empty($artist['image_path'])): ?>
                     <img src="<?= e($artist['image_path']) ?>" alt="<?= e($artist['name']) ?>" style="max-width:100%;border-radius:8px;">
                 <?php endif; ?>
                 <p><?= e($artist['description']) ?></p>
+                <?php if (!empty($artist['user_email'])): ?>
+                    <p><small>Linked user: <?= e($artist['user_full_name'] ?? $artist['name']) ?> · <?= e($artist['user_email']) ?></small></p>
+                <?php endif; ?>
                 <?php if (is_admin()): ?>
                     <div class="hero-actions" style="margin-top:0.5rem;">
                         <a class="button button-secondary" href="/artists/edit?id=<?= e((string) $artist['id']) ?>">Edit</a>

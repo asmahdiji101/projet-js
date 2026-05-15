@@ -1,49 +1,144 @@
-<section class="hero">
-    <div class="hero-copy">
-        <span class="eyebrow">Premium event platform</span>
-        <h1>Book, manage and experience events with a modern ticketing flow.</h1>
-        <p>
-            A dynamic PHP + JavaScript project focused on immersive events, artist management,
-            ticket booking and admin analytics.
-        </p>
-        <div class="hero-actions">
-            <a class="button button-primary" href="/events">Explore events</a>
-            <?php if (is_admin()): ?>
-                <a class="button button-secondary" href="#">Admin demo</a>
+<section class="home-shell">
+    <aside class="home-sidebar home-sidebar-left">
+        <div class="home-panel home-brand-panel">
+            <div class="home-brand-row">
+                <img src="/images/logo.svg" alt="AIO Events" class="home-brand-logo">
+                <div>
+                    <strong>AIO Events</strong>
+                    <p>Discover, book, follow.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-panel home-menu-panel">
+            <div class="home-menu-title">Navigation</div>
+            <a class="home-menu-item is-active" href="/">Accueil</a>
+            <a class="home-menu-item" href="/events">Carte</a>
+            <a class="home-menu-item" href="/notifications">Notifications</a>
+            <a class="home-menu-item" href="/contact">Support</a>
+            <?php if (is_authenticated()): ?>
+                <a class="home-menu-item" href="/dashboard">Mon compte</a>
+                <a class="home-menu-item" href="/account/edit">Modifier le compte</a>
             <?php endif; ?>
         </div>
-    </div>
 
-    <div class="hero-panel">
-        <div class="stats-card">
-            <span>Available now</span>
-            <strong>3 event spaces</strong>
-            <small>Live showcases, workshops and VIP access</small>
+        <div class="home-panel home-download-panel">
+            <div class="home-menu-title">Télécharger l'App</div>
+            <p>Keep your events and tickets close at hand.</p>
+            <a class="button button-primary button-block" href="/events">Open events</a>
         </div>
-    </div>
-</section>
+    </aside>
 
-<section class="featured" id="featured">
-    <div class="section-heading">
-        <span>Available now</span>
-        <h2>All events on NeonPass</h2>
-    </div>
+    <section class="home-center">
+        <div class="home-panel home-search-panel">
+            <form method="get" action="/" class="home-search-form">
+                <label class="home-search-field home-search-main">
+                    <span>Rechercher...</span>
+                    <input type="search" name="q" value="<?= e($filters['query'] ?? '') ?>" placeholder="Search events">
+                </label>
+                <label class="home-search-field">
+                    <span>Date</span>
+                    <input type="date" name="date" value="<?= e($filters['date'] ?? '') ?>">
+                </label>
+                <label class="home-search-field">
+                    <span>Ville</span>
+                    <input type="text" name="city" value="<?= e($filters['city'] ?? '') ?>" placeholder="City">
+                </label>
+                <label class="home-search-field">
+                    <span>Type</span>
+                    <select name="category">
+                        <option value="">All</option>
+                        <?php foreach ($categories as $key => $label): ?>
+                            <option value="<?= e($key) ?>" <?= ($filters['category'] ?? '') === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+                <button type="submit" class="home-search-submit" aria-label="Search events">⌕</button>
+            </form>
+        </div>
 
-    <div class="cards">
-        <?php if (empty($events)): ?>
-            <div class="auth-card"><p>No events available yet.</p></div>
-        <?php else: ?>
-            <?php foreach ($events as $event): ?>
-                <a class="card event-card-link" href="/events/<?= (int)$event['id'] ?>">
-                    <?php if (!empty($event['image_path'])): ?>
-                        <img src="<?= e($event['image_path']) ?>" alt="<?= e($event['title']) ?>" class="event-card-image">
-                    <?php endif; ?>
-                    <span class="eyebrow"><?= e($event['artist_name'] ?? 'Event') ?></span>
-                    <h3><?= e($event['title']) ?></h3>
-                    <p><?= e($event['description']) ?></p>
-                    <small><?= e($event['event_date']) ?> — <?= e($event['location']) ?></small>
+        <div class="home-categories">
+            <?php foreach ($categories as $key => $label): ?>
+                <a class="home-category-card <?= ($filters['category'] ?? '') === $key ? 'is-active' : '' ?>" href="/?category=<?= e($key) ?>">
+                    <span class="home-category-icon"><?= e(substr($label, 0, 1)) ?></span>
+                    <strong><?= e($label) ?></strong>
                 </a>
             <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
+        </div>
+
+        <div class="home-feed">
+            <?php if (empty($events)): ?>
+                <div class="home-empty-state">
+                    <h2>No events match your filters yet.</h2>
+                    <p>Try another city, date or event type.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($events as $event): ?>
+                    <a class="home-feed-card" href="/events/<?= (int) $event['id'] ?>">
+                        <div class="home-feed-header">
+                            <div class="home-feed-author">
+                                <strong><?= e($event['artist_name'] ?? 'Event') ?></strong>
+                                <span><?= e($event['location']) ?></span>
+                            </div>
+                            <span class="feed-pill"><?= e($categories[$event['category'] ?? 'concert'] ?? 'Event') ?></span>
+                        </div>
+
+                        <div class="home-feed-media">
+                            <?php if (!empty($event['image_path'])): ?>
+                                <img src="<?= e($event['image_path']) ?>" alt="<?= e($event['title']) ?>">
+                            <?php else: ?>
+                                <div class="home-feed-placeholder">AIO</div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="home-feed-body">
+                            <div class="home-feed-title-row">
+                                <h3><?= e($event['title']) ?></h3>
+                                <span><?= e($event['event_date']) ?></span>
+                            </div>
+                            <p><?= e($event['description']) ?></p>
+                            <div class="home-feed-actions">
+                                <span>Open details</span>
+                                <strong>Book tickets</strong>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <aside class="home-sidebar home-sidebar-right">
+        <div class="home-panel home-trend-panel">
+            <div class="home-side-title">
+                <span>↗</span>
+                <strong>Tendances</strong>
+            </div>
+
+            <div class="home-side-list">
+                <?php foreach (array_slice($events, 0, 3) as $event): ?>
+                    <a class="home-side-card" href="/events/<?= (int) $event['id'] ?>">
+                        <strong><?= e($event['title']) ?></strong>
+                        <small><?= e($event['location']) ?></small>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="home-panel home-places-panel">
+            <div class="home-side-title">
+                <span>⌂</span>
+                <strong>Lieux populaires</strong>
+            </div>
+
+            <div class="home-side-list">
+                <?php foreach (array_slice(array_values(array_filter(array_unique(array_map(static fn (array $event): string => (string) ($event['location'] ?? ''), $events)))), 0, 5) as $place): ?>
+                    <div class="home-place-card">
+                        <strong><?= e($place) ?></strong>
+                        <small>Popular venue</small>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </aside>
 </section>

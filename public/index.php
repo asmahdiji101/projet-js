@@ -34,6 +34,16 @@ if ($method === 'POST' && $uri === '/register') {
     return;
 }
 
+if ($method === 'GET' && $uri === '/account/edit') {
+    (new AuthController())->showEditProfile();
+    return;
+}
+
+if ($method === 'POST' && $uri === '/account/update') {
+    (new AuthController())->updateProfile();
+    return;
+}
+
 if ($method === 'POST' && $uri === '/events/store') {
     (new EventController())->store();
     return;
@@ -119,6 +129,11 @@ if ($method === 'GET' && $uri === '/notifications') {
     return;
 }
 
+if ($method === 'GET' && $uri === '/notifications/open') {
+    (new App\Controllers\NotificationController())->open();
+    return;
+}
+
 if ($method === 'GET' && $uri === '/admin/stats/live') {
     (new AdminController())->liveStats();
     return;
@@ -139,6 +154,12 @@ switch ($uri) {
         break;
     case '/admin':
         (new AdminController())->dashboard();
+        break;
+    case '/admin/bookings':
+        (new AdminController())->bookings();
+        break;
+    case '/admin/revenue':
+        (new AdminController())->revenue();
         break;
     case '/events':
         (new EventController())->index();

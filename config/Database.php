@@ -67,6 +67,8 @@ final class Database
                 self::initializeSqlite(self::$instance);
             }
 
+            self::migrateSqlite(self::$instance);
+
             $row = self::$instance->query('SELECT COUNT(*) AS count FROM users')->fetch();
 
             if ((int) ($row['count'] ?? 0) === 0) {
@@ -94,6 +96,7 @@ final class Database
 
         CREATE TABLE IF NOT EXISTS artists (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER DEFAULT NULL UNIQUE,
             name TEXT NOT NULL,
             slug TEXT NOT NULL UNIQUE,
             description TEXT NOT NULL,
@@ -105,6 +108,7 @@ final class Database
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             artist_id INTEGER DEFAULT NULL,
             user_artist_id INTEGER DEFAULT NULL,
+            category TEXT NOT NULL DEFAULT 'concert',
             title TEXT NOT NULL,
             slug TEXT NOT NULL UNIQUE,
             description TEXT NOT NULL,
@@ -189,5 +193,41 @@ final class Database
         $pdo->exec("INSERT INTO tickets (event_id, name, price, quantity_total, quantity_sold) VALUES
             ($eventId, 'Standard', 25.00, 120, 0),
             ($eventId, 'VIP', 55.00, 30, 0)");
+    }
+
+    private static function migrateSqlite(PDO $pdo): void
+    {
+        self::ensureColumn($pdo, 'artists', 'user_id', 'INTEGER DEFAULT NULL');
+        self::ensureColumn($pdo, 'events', 'category', "TEXT NOT NULL DEFAULT 'concert'");
+        self::ensureUniqueIndex($pdo, 'artists', 'user_id');
+
+        $pdo->exec("UPDATE events SET category = 'concert' WHERE category IS NULL OR category = ''");
+    }
+
+    private static function ensureColumn(PDO $pdo, string $table, string $column, string $definition): void
+    {
+        $columns = $pdo->query('PRAGMA table_info(' . $table . ')')->fetchAll();
+
+        foreach ($columns as $existingColumn) {
+            if (($existingColumn['name'] ?? null) === $column) {
+                return;
+            }
+        }
+
+        $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $column . ' ' . $definition);
+    }
+
+    private static function ensureUniqueIndex(PDO $pdo, string $table, string $column): void
+    {
+        $indexName = $table . '_' . $column . '_unique_idx';
+        $indexes = $pdo->query('PRAGMA index_list(' . $table . ')')->fetchAll();
+
+        foreach ($indexes as $index) {
+            if (($index['name'] ?? null) === $indexName) {
+                return;
+            }
+        }
+
+        $pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS ' . $indexName . ' ON ' . $table . ' (' . $column . ')');
     }
 }

@@ -45,9 +45,27 @@
         <h2>Management</h2>
     </div>
 
-    <div class="hero-actions">
-        <a class="button button-primary" href="/admin/pending-events">Pending Event Approvals</a>
-        <a class="button button-primary" href="/admin/messages">Contact Messages</a>
+    <div class="admin-block-grid">
+        <a class="admin-block" href="/admin/pending-events">
+            <span>Approvals</span>
+            <strong>Pending events</strong>
+            <p>Review artist submissions and publish them.</p>
+        </a>
+        <a class="admin-block" href="/admin/messages">
+            <span>Inbox</span>
+            <strong>Contact messages</strong>
+            <p>Open user and artist requests, then reply.</p>
+        </a>
+        <a class="admin-block" href="/admin/bookings">
+            <span>Reservations</span>
+            <strong>All bookings</strong>
+            <p>Browse reservation records and ticket details.</p>
+        </a>
+        <a class="admin-block" href="/admin/revenue">
+            <span>Analytics</span>
+            <strong>Revenue reports</strong>
+            <p>See revenue by event category and city.</p>
+        </a>
     </div>
 </section>
 

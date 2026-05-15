@@ -8,7 +8,12 @@ final class Artist extends BaseModel
 {
     public function all(): array
     {
-        return $this->fetchAll('SELECT * FROM artists ORDER BY created_at DESC');
+        return $this->fetchAll(
+            'SELECT artists.*, users.full_name AS user_full_name, users.email AS user_email, users.profile_picture_path AS user_profile_picture_path
+             FROM artists
+             LEFT JOIN users ON users.id = artists.user_id
+             ORDER BY artists.created_at DESC'
+        );
     }
 
     public function countAll(): int
@@ -18,11 +23,12 @@ final class Artist extends BaseModel
         return (int) ($row['count'] ?? 0);
     }
 
-    public function create(string $name, string $slug, string $description, ?string $imagePath = null): int
+    public function create(string $name, string $slug, string $description, ?string $imagePath = null, ?int $userId = null): int
     {
         $this->execute(
-            'INSERT INTO artists (name, slug, description, image_path) VALUES (:name, :slug, :description, :image_path)',
+            'INSERT INTO artists (user_id, name, slug, description, image_path) VALUES (:user_id, :name, :slug, :description, :image_path)',
             [
+                ':user_id' => $userId,
                 ':name' => $name,
                 ':slug' => $slug,
                 ':description' => $description,
@@ -38,12 +44,18 @@ final class Artist extends BaseModel
         return $this->fetchOne('SELECT * FROM artists WHERE id = :id LIMIT 1', [':id' => $id]);
     }
 
-    public function update(int $id, string $name, string $slug, string $description, ?string $imagePath = null): bool
+    public function findByUserId(int $userId): ?array
+    {
+        return $this->fetchOne('SELECT * FROM artists WHERE user_id = :user_id LIMIT 1', [':user_id' => $userId]);
+    }
+
+    public function update(int $id, string $name, string $slug, string $description, ?string $imagePath = null, ?int $userId = null): bool
     {
         return $this->execute(
-            'UPDATE artists SET name = :name, slug = :slug, description = :description, image_path = COALESCE(:image_path, image_path) WHERE id = :id',
+            'UPDATE artists SET user_id = COALESCE(:user_id, user_id), name = :name, slug = :slug, description = :description, image_path = COALESCE(:image_path, image_path) WHERE id = :id',
             [
                 ':id' => $id,
+                ':user_id' => $userId,
                 ':name' => $name,
                 ':slug' => $slug,
                 ':description' => $description,

@@ -3,7 +3,18 @@
     <h1>Bienvenue, <?= e($user['full_name']) ?></h1>
     <p>Email: <?= e($user['email']) ?></p>
     <p>Rôle: <?= e(ucfirst($user['role'])) ?></p>
-    <a class="button button-secondary" href="/logout">Se déconnecter</a>
+    <div class="hero-actions">
+        <a class="button button-primary" href="/account/edit">Modifier le compte</a>
+        <a class="button button-secondary" href="/logout">Se déconnecter</a>
+    </div>
+
+    <?php $avatar = avatar_url($user['profile_picture_path'] ?? null); ?>
+    <div class="account-hero">
+        <img src="<?= e($avatar) ?>" alt="avatar" class="account-avatar">
+        <div>
+            <p class="account-note">Votre photo de profil est utilisée dans la navigation et l’administration.</p>
+        </div>
+    </div>
 
     <?php if (!empty($notifications)): ?>
         <div class="section-heading" style="margin-top:2rem;">

@@ -15,7 +15,14 @@ final class EventController extends Controller
 {
     public function index(): void
     {
-        $events = (new Event())->allPublished();
+        $filters = [
+            'query' => trim((string) ($_GET['q'] ?? '')),
+            'city' => trim((string) ($_GET['city'] ?? '')),
+            'date' => trim((string) ($_GET['date'] ?? '')),
+            'category' => trim((string) ($_GET['category'] ?? '')),
+        ];
+
+        $events = (new Event())->searchPublished($filters);
 
         foreach ($events as &$event) {
             $event['tickets'] = (new Ticket())->forEvent((int) $event['id']);
@@ -23,6 +30,8 @@ final class EventController extends Controller
 
         $this->render('event/index', [
             'events' => $events,
+            'filters' => $filters,
+            'categories' => Event::CATEGORIES,
         ]);
     }
 
@@ -46,6 +55,7 @@ final class EventController extends Controller
         $this->render('event/edit', [
             'event' => $event,
             'artists' => (new Artist())->all(),
+            'categories' => Event::CATEGORIES,
             'tickets' => (new Ticket())->forEvent($eventId),
         ]);
     }
@@ -60,7 +70,9 @@ final class EventController extends Controller
 
         // If user is artist, show artist form (no artist selector)
         if (is_authenticated() && $_SESSION['user']['role'] === 'artist') {
-            $this->render('event/artist-create');
+            $this->render('event/artist-create', [
+                'categories' => Event::CATEGORIES,
+            ]);
             return;
         }
 
@@ -75,6 +87,7 @@ final class EventController extends Controller
 
         $this->render('event/create', [
             'artists' => $artists,
+            'categories' => Event::CATEGORIES,
         ]);
     }
 
@@ -90,9 +103,14 @@ final class EventController extends Controller
         $description = trim($_POST['description'] ?? '');
         $eventDate = trim($_POST['event_date'] ?? '');
         $location = trim($_POST['location'] ?? '');
+        $category = trim($_POST['category'] ?? 'concert');
         $ticketName = trim($_POST['ticket_name'] ?? 'Standard');
         $ticketPrice = (float) ($_POST['ticket_price'] ?? 0);
         $ticketQuantity = (int) ($_POST['ticket_quantity'] ?? 0);
+
+        if (!isset(Event::CATEGORIES[$category])) {
+            $category = 'concert';
+        }
 
         $isArtist = $_SESSION['user']['role'] === 'artist';
         $isAdmin = is_admin();
@@ -112,6 +130,7 @@ final class EventController extends Controller
             if ($artistId <= 0) {
                 $this->render('event/create', [
                     'artists' => (new Artist())->all(),
+                    'categories' => Event::CATEGORIES,
                     'error' => 'Artist is required.',
                 ]);
                 return;
@@ -125,11 +144,13 @@ final class EventController extends Controller
         if ($title === '' || $description === '' || $eventDate === '' || $location === '') {
             if ($isArtist) {
                 $this->render('event/artist-create', [
+                    'categories' => Event::CATEGORIES,
                     'error' => 'All event fields are required.',
                 ]);
             } else {
                 $this->render('event/create', [
                     'artists' => (new Artist())->all(),
+                    'categories' => Event::CATEGORIES,
                     'error' => 'All event fields are required.',
                 ]);
             }
@@ -146,7 +167,7 @@ final class EventController extends Controller
         $ts = strtotime($eventDate);
         if ($ts === false || $ts <= time()) {
             $renderView = $isArtist ? 'event/artist-create' : 'event/create';
-            $context = $isArtist ? ['error' => 'Event date must be in the future.'] : ['artists' => (new Artist())->all(), 'error' => 'Event date must be in the future.'];
+            $context = $isArtist ? ['categories' => Event::CATEGORIES, 'error' => 'Event date must be in the future.'] : ['artists' => (new Artist())->all(), 'categories' => Event::CATEGORIES, 'error' => 'Event date must be in the future.'];
             $this->render($renderView, $context);
             return;
         }
@@ -157,7 +178,7 @@ final class EventController extends Controller
 
             if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
                 $renderView = $isArtist ? 'event/artist-create' : 'event/create';
-                $context = $isArtist ? ['error' => 'Invalid image type.'] : ['artists' => (new Artist())->all(), 'error' => 'Invalid image type.'];
+                $context = $isArtist ? ['categories' => Event::CATEGORIES, 'error' => 'Invalid image type.'] : ['artists' => (new Artist())->all(), 'categories' => Event::CATEGORIES, 'error' => 'Invalid image type.'];
                 $this->render($renderView, $context);
                 return;
             }
@@ -165,7 +186,7 @@ final class EventController extends Controller
             // Limit event image size to 2MB
             if (isset($_FILES['image']['size']) && $_FILES['image']['size'] > 2 * 1024 * 1024) {
                 $renderView = $isArtist ? 'event/artist-create' : 'event/create';
-                $context = $isArtist ? ['error' => 'Event image must be <= 2MB.'] : ['artists' => (new Artist())->all(), 'error' => 'Event image must be <= 2MB.'];
+                $context = $isArtist ? ['categories' => Event::CATEGORIES, 'error' => 'Event image must be <= 2MB.'] : ['artists' => (new Artist())->all(), 'categories' => Event::CATEGORIES, 'error' => 'Event image must be <= 2MB.'];
                 $this->render($renderView, $context);
                 return;
             }
@@ -180,7 +201,7 @@ final class EventController extends Controller
 
             if (!store_uploaded_image($_FILES['image'], $target, 1600, 900)) {
                 $renderView = $isArtist ? 'event/artist-create' : 'event/create';
-                $context = $isArtist ? ['error' => 'Failed to move file.'] : ['artists' => (new Artist())->all(), 'error' => 'Failed to move file.'];
+                $context = $isArtist ? ['categories' => Event::CATEGORIES, 'error' => 'Failed to move file.'] : ['artists' => (new Artist())->all(), 'categories' => Event::CATEGORIES, 'error' => 'Failed to move file.'];
                 $this->render($renderView, $context);
                 return;
             }
@@ -189,7 +210,7 @@ final class EventController extends Controller
         }
 
         $eventModel = new Event();
-        $eventId = $eventModel->create($artistId, $title, $slug, $description, $eventDate, $location, $imagePath, $status, $approvalStatus, $userArtistId);
+        $eventId = $eventModel->create($artistId, $title, $slug, $description, $eventDate, $location, $imagePath, $status, $approvalStatus, $userArtistId, $category);
 
         if ($isArtist) {
             foreach ((new User())->idsByRole('admin') as $adminId) {
@@ -242,9 +263,24 @@ final class EventController extends Controller
             $this->render('event/edit', [
                 'event' => $event,
                 'artists' => (new Artist())->all(),
+                'categories' => Event::CATEGORIES,
                 'tickets' => (new Ticket())->forEvent($eventId),
                 'error' => 'All event fields are required.',
             ]);
+            return;
+        }
+
+        $category = trim($_POST['category'] ?? 'concert');
+
+        if (!isset(Event::CATEGORIES[$category])) {
+            $this->render('event/edit', [
+                'event' => $event,
+                'artists' => (new Artist())->all(),
+                'categories' => Event::CATEGORIES,
+                'tickets' => (new Ticket())->forEvent($eventId),
+                'error' => 'Invalid category selected.',
+            ]);
+
             return;
         }
 
@@ -263,6 +299,7 @@ final class EventController extends Controller
                 $this->render('event/edit', [
                     'event' => $event,
                     'artists' => (new Artist())->all(),
+                    'categories' => Event::CATEGORIES,
                     'tickets' => (new Ticket())->forEvent($eventId),
                     'error' => 'Invalid image type.',
                 ]);
@@ -281,6 +318,7 @@ final class EventController extends Controller
                 $this->render('event/edit', [
                     'event' => $event,
                     'artists' => (new Artist())->all(),
+                    'categories' => Event::CATEGORIES,
                     'tickets' => (new Ticket())->forEvent($eventId),
                     'error' => 'Failed to move uploaded file.',
                 ]);
@@ -290,7 +328,7 @@ final class EventController extends Controller
             $imagePath = '/uploads/events/' . $filename;
         }
 
-        (new Event())->update($eventId, $artistId, $title, $slug, $description, $eventDate, $location, $imagePath, $status);
+        (new Event())->update($eventId, $artistId, $title, $slug, $description, $eventDate, $location, $imagePath, $status, $category);
 
         redirect('/events/edit?id=' . $eventId);
     }

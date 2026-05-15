@@ -18,6 +18,15 @@
         </label>
 
         <label>
+            Type of event
+            <select name="category" required>
+                <?php foreach ($categories as $key => $label): ?>
+                    <option value="<?= e($key) ?>"><?= e($label) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+
+        <label>
             Title
             <input type="text" name="title" required>
         </label>
@@ -33,8 +42,8 @@
         </label>
 
         <label>
-            Location
-            <input type="text" name="location" required>
+            Ville / location
+            <input type="text" name="location" placeholder="Paris, Lyon, Marrakech..." required>
         </label>
 
         <label>
