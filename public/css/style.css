@@ -121,9 +121,9 @@ main {
 
 .home-shell {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(260px, 1fr) minmax(0, 2fr) minmax(260px, 1fr);
     gap: 1.25rem;
-    align-items: start;
+    align-items: stretch;
     max-width: 1600px;
     margin: 0 auto;
 }
@@ -137,6 +137,10 @@ main {
 .home-center {
     display: grid;
     gap: 1rem;
+    min-height: calc(100vh - 8.5rem);
+    max-height: calc(100vh - 8.5rem);
+    overflow-y: auto;
+    padding-right: 0.25rem;
 }
 
 .home-panel {
@@ -1182,6 +1186,13 @@ main {
 
     .home-sidebar-right {
         position: static;
+    }
+
+    .home-center {
+        min-height: auto;
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
     }
 }
 
