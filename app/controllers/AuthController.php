@@ -77,7 +77,7 @@ final class AuthController extends Controller
 
         // Handle profile picture upload
         $profilePicturePath = null;
-        $uploadDir = dirname(__DIR__) . '/public/uploads/profiles/';
+        $uploadDir = PUBLIC_PATH . '/uploads/profiles/';
 
         if (!is_dir($uploadDir)) {
             @mkdir($uploadDir, 0755, true);
@@ -260,7 +260,7 @@ final class AuthController extends Controller
                 return;
             }
 
-            $uploadDir = dirname(__DIR__) . '/public/uploads/profiles/';
+            $uploadDir = PUBLIC_PATH . '/uploads/profiles/';
             if (!is_dir($uploadDir)) {
                 @mkdir($uploadDir, 0755, true);
             }

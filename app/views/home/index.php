@@ -16,18 +16,6 @@
             <a class="home-menu-item" href="/events">Carte</a>
             <a class="home-menu-item" href="/notifications">Notifications</a>
             <a class="home-menu-item" href="/contact">Support</a>
-            <?php if (is_authenticated()): ?>
-                <a class="home-menu-item" href="/dashboard">Mon compte</a>
-                <a class="home-menu-item" href="/account/edit">Modifier le compte</a>
-            <?php endif; ?>
-
-            <?php if (is_admin()): ?>
-                <hr>
-                <a class="home-menu-item" href="/artists">Artistes</a>
-                <a class="home-menu-item" href="/events/create">Créer un événement</a>
-                <a class="home-menu-item" href="/admin/revenue">Revenue</a>
-                <a class="home-menu-item" href="/admin/bookings">Reservations</a>
-            <?php endif; ?>
         </div>
 
         <div class="home-panel home-download-panel">
