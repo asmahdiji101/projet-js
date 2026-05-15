@@ -16,6 +16,22 @@
             <a class="home-menu-item" href="/events">Carte</a>
             <a class="home-menu-item" href="/notifications">Notifications</a>
             <a class="home-menu-item" href="/contact">Support</a>
+
+            <?php if (is_authenticated()): ?>
+                <a class="home-menu-item" href="/dashboard">Mon compte</a>
+                <a class="home-menu-item" href="/account/edit">Modifier le compte</a>
+
+                <?php if ($_SESSION['user']['role'] === 'artist'): ?>
+                    <a class="home-menu-item" href="/events/create">Créer un événement</a>
+                    <a class="home-menu-item" href="/events/artist-events">Mes événements</a>
+                <?php endif; ?>
+
+                <?php if (is_admin()): ?>
+                    <a class="home-menu-item" href="/events/create">Créer un événement</a>
+                    <a class="home-menu-item" href="/artists">Artistes</a>
+                    <a class="home-menu-item" href="/admin">Administration</a>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
 
         <div class="home-panel home-download-panel">

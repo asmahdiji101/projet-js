@@ -16,32 +16,17 @@
             </div>
         </div>
         <nav class="topbar-actions">
-            <a class="topbar-action" href="/events">Événements</a>
-            <a class="topbar-action" href="/cart">Panier</a>
-
             <?php if (is_authenticated()): ?>
-                <a class="topbar-action" href="/notifications">
-                    Notifications
+                <a href="/notifications" class="topbar-icon-link" aria-label="Notifications">
+                    <span class="topbar-icon">🔔</span>
                     <?php $unread = (new \App\Models\Notification())->unreadCount((int) ($_SESSION['user']['id'] ?? 0)); ?>
                     <?php if ($unread > 0): ?>
                         <span class="notif-badge"><?= e((string) $unread) ?></span>
                     <?php endif; ?>
                 </a>
-                <a class="topbar-action" href="/dashboard">Mon compte</a>
-                <a class="topbar-action" href="/account/edit">Modifier le compte</a>
-
-                <?php if ($_SESSION['user']['role'] === 'artist'): ?>
-                    <a class="topbar-action" href="/events/create">Créer un événement</a>
-                    <a class="topbar-action" href="/events/artist-events">Mes événements</a>
-                <?php endif; ?>
-
-                <?php if (is_admin()): ?>
-                    <a class="topbar-action" href="/events/create">Créer un événement</a>
-                    <a class="topbar-action" href="/artists">Artistes</a>
-                    <a class="topbar-action" href="/admin">Administration</a>
-                <?php endif; ?>
-
-                <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?" class="topbar-action">Déconnexion</a>
+                <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?" class="topbar-icon-link" aria-label="Déconnexion">
+                    <span class="topbar-icon">⎋</span>
+                </a>
 
                 <?php $avatar = avatar_url($_SESSION['user']['profile_picture_path'] ?? null); ?>
                 <img src="<?= e($avatar) ?>" alt="avatar" class="nav-avatar" onerror="this.src='/images/default-avatar.svg'">

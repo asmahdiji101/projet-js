@@ -131,8 +131,7 @@ main {
 .home-sidebar {
     display: grid;
     gap: 1rem;
-    position: sticky;
-    top: 6.5rem;
+    position: static;
 }
 
 .home-center {
