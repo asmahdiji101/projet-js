@@ -60,7 +60,7 @@
         <div class="home-categories">
             <?php foreach ($categories as $key => $label): ?>
                 <a class="home-category-card <?= ($filters['category'] ?? '') === $key ? 'is-active' : '' ?>" href="/?category=<?= e($key) ?>">
-                    <span class="home-category-icon"><?= e(substr($label, 0, 1)) ?></span>
+                    <img class="home-category-icon-image" src="/images/event-types/<?= e($key) ?>.svg" alt="<?= e($label) ?>">
                     <strong><?= e($label) ?></strong>
                 </a>
             <?php endforeach; ?>

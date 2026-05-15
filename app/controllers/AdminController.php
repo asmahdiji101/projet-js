@@ -34,8 +34,11 @@ final class AdminController extends Controller
             'unread_notifications' => (new Notification())->unreadCount((int) ($_SESSION['user']['id'] ?? 0)),
         ];
 
+        $revenueCurve = (new Booking())->revenueByMonth(12);
+
         $this->render('admin/dashboard', [
             'stats' => $stats,
+            'revenueCurve' => $revenueCurve,
         ]);
     }
 
@@ -71,6 +74,7 @@ final class AdminController extends Controller
             'byCategory' => $bookingModel->revenueByCategory(),
             'byLocation' => $bookingModel->revenueByLocation(),
             'totalBookings' => $bookingModel->countAll(),
+            'revenueCurve' => $bookingModel->revenueByMonth(12),
         ]);
     }
 

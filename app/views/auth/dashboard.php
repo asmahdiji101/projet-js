@@ -3,17 +3,18 @@
     <h1>Bienvenue, <?= e($user['full_name']) ?></h1>
     <p>Email: <?= e($user['email']) ?></p>
     <p>Rôle: <?= e(ucfirst($user['role'])) ?></p>
-    <div class="hero-actions">
-        <a class="button button-primary" href="/account/edit">Modifier le compte</a>
-        <a class="button button-secondary" href="/logout">Se déconnecter</a>
-    </div>
 
     <?php $avatar = avatar_url($user['profile_picture_path'] ?? null); ?>
     <div class="account-hero">
-        <img src="<?= e($avatar) ?>" alt="avatar" class="account-avatar">
+        <img src="<?= e($avatar) ?>" alt="avatar" class="account-avatar" onerror="this.src='/images/default-avatar.svg'">
         <div>
             <p class="account-note">Votre photo de profil est utilisée dans la navigation et l’administration.</p>
         </div>
+    </div>
+
+    <div class="account-actions">
+        <a class="button button-primary" href="/account/edit">Modifier le compte</a>
+        <a class="button button-secondary" href="/logout">Se déconnecter</a>
     </div>
 
     <?php if (!empty($notifications)): ?>
@@ -61,8 +62,10 @@
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
-        <a class="button button-primary" href="/events/create" style="margin-top:1rem;">Submit new event</a>
-        <a class="button button-secondary" href="/events/artist-events" style="margin-top:1rem;">View all my event statuses</a>
+        <div class="account-actions">
+            <a class="button button-primary" href="/events/create">Submit new event</a>
+            <a class="button button-secondary" href="/events/artist-events">View all my event statuses</a>
+        </div>
     <?php else: ?>
         <div class="section-heading" style="margin-top:2rem;">
             <span>Bookings</span>

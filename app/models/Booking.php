@@ -73,6 +73,40 @@ final class Booking extends BaseModel
         );
     }
 
+    public function revenueByMonth(int $months = 12): array
+    {
+        $rows = $this->fetchAll(
+            'SELECT strftime("%Y-%m", bookings.created_at) AS month_key, COALESCE(SUM(bookings.total_price), 0) AS revenue
+             FROM bookings
+             WHERE bookings.status = :status
+             GROUP BY strftime("%Y-%m", bookings.created_at)
+             ORDER BY month_key ASC',
+            [':status' => 'confirmed']
+        );
+
+        $rowMap = [];
+        foreach ($rows as $row) {
+            $rowMap[(string) $row['month_key']] = (float) $row['revenue'];
+        }
+
+        $labels = [];
+        $values = [];
+        $current = new \DateTimeImmutable('first day of this month');
+        $start = $current->modify('-' . max(0, $months - 1) . ' months');
+
+        for ($index = 0; $index < $months; $index++) {
+            $month = $start->modify('+' . $index . ' months');
+            $key = $month->format('Y-m');
+            $labels[] = $month->format('M');
+            $values[] = $rowMap[$key] ?? 0.0;
+        }
+
+        return [
+            'labels' => $labels,
+            'values' => $values,
+        ];
+    }
+
     public function create(int $userId, int $ticketId, int $quantity, float $totalPrice): int
     {
         $this->execute(

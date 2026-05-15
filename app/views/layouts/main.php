@@ -15,39 +15,34 @@
                 <p>Events, tickets and immersive experiences</p>
             </div>
         </div>
-        <nav class="nav">
-            <a href="/">Accueil</a>
-            <a href="/events">Événements</a>
-            <a href="/cart">Panier</a>
-            <?php if (!is_admin()): ?>
-                <a href="/contact">Contact</a>
-            <?php endif; ?>
+        <div class="topbar-actions">
             <?php if (is_authenticated()): ?>
-                <a href="/notifications" class="nav-notif">Notifications
+                <a href="/notifications" class="topbar-icon-link" aria-label="Notifications">
                     <?php $unread = (new \App\Models\Notification())->unreadCount((int) ($_SESSION['user']['id'] ?? 0)); ?>
+                    <span class="topbar-icon">🔔</span>
                     <?php if ($unread > 0): ?>
-                        <span class="notif-badge"><?= e((string)$unread) ?></span>
+                        <span class="notif-badge"><?= e((string) $unread) ?></span>
                     <?php endif; ?>
                 </a>
-                <?php if ($_SESSION['user']['role'] === 'artist'): ?>
-                    <a href="/events/artist-events">Mes événements</a>
-                <?php endif; ?>
-                <a href="/dashboard">Mon compte</a>
-                <a href="/account/edit">Modifier le compte</a>
                 <?php if (is_admin()): ?>
-                    <a href="/events/create">Créer un événement</a>
-                    <a href="/artists">Artistes</a>
-                    <a href="/admin">Administration</a>
+                    <a class="topbar-icon-link" href="/admin" aria-label="Administration">
+                        <span class="topbar-icon">▣</span>
+                    </a>
                 <?php endif; ?>
-                <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?">Déconnexion</a>
+                <a class="topbar-icon-link" href="/dashboard" aria-label="Mon compte">
+                    <span class="topbar-icon">☺</span>
+                </a>
+                <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?" class="topbar-icon-link" aria-label="Déconnexion">
+                    <span class="topbar-icon">⎋</span>
+                </a>
 
                 <?php $avatar = avatar_url($_SESSION['user']['profile_picture_path'] ?? null); ?>
-                <img src="<?= e($avatar) ?>" alt="avatar" class="nav-avatar">
+                <img src="<?= e($avatar) ?>" alt="avatar" class="nav-avatar" onerror="this.src='/images/default-avatar.svg'">
             <?php else: ?>
-                <a href="/login">Connexion</a>
-                <a href="/register">Inscription</a>
+                <a href="/login" class="topbar-action">Connexion</a>
+                <a href="/register" class="topbar-action topbar-action-primary">Inscription</a>
             <?php endif; ?>
-        </nav>
+        </div>
     </header>
 
     <main>
