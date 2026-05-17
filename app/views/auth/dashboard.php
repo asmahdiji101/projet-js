@@ -24,7 +24,7 @@
         </div>
         <div class="cart-items">
             <?php foreach ($notifications as $notif): ?>
-                <article class="cart-item" style="background:<?= $notif['is_read'] ? '#f9f9f9' : '#e3f2fd' ?>;">
+                <article class="cart-item" style="<?= $notif['is_read'] ? '' : 'border: 1px solid var(--accent);' ?>">
                     <div>
                         <h3><?= e($notif['title']) ?></h3>
                         <p><?= e($notif['message']) ?></p>
@@ -66,6 +66,30 @@
             <a class="button button-primary" href="/events/create">Submit new event</a>
             <a class="button button-secondary" href="/events/artist-events">View all my event statuses</a>
         </div>
+        <div class="section-heading" style="margin-top:2rem;">
+            <span>Bookings</span>
+            <h2>Booking history & tracking</h2>
+        </div>
+
+        <?php if (empty($artistBookings)): ?>
+            <p>No bookings for your events yet.</p>
+        <?php else: ?>
+            <div class="cards">
+                <?php foreach ($artistBookings as $b): ?>
+                    <article class="card">
+                        <h3><?= e($b['event_title']) ?> — <?= e($b['ticket_name']) ?> x<?= e((string) $b['quantity']) ?></h3>
+                        <p><small>Booked by <?= e($b['buyer_name']) ?> on <?= e($b['created_at']) ?></small></p>
+                        <p><strong>Status:</strong> <?= e(ucfirst($b['status'] ?? 'confirmed')) ?></p>
+                        <div style="margin-top:0.5rem;">
+                            <small>Tracking:</small>
+                            <div style="height:8px;background:#f1f1f1;border-radius:8px;overflow:hidden;margin-top:6px;">
+                                <div style="width:<?= ($b['status'] === 'confirmed' ? '50' : ($b['status'] === 'completed' ? '100' : '20')) ?>%;height:100%;background:linear-gradient(90deg,var(--accent),#ffb25c);"></div>
+                            </div>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     <?php else: ?>
         <div class="section-heading" style="margin-top:2rem;">
             <span>Bookings</span>

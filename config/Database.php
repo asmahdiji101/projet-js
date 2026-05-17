@@ -145,6 +145,18 @@ final class Database
             FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS cart_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            ticket_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+            UNIQUE (user_id, ticket_id)
+        );
+
         CREATE TABLE IF NOT EXISTS contact_messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             sender_id INTEGER NOT NULL,
@@ -201,7 +213,31 @@ final class Database
         self::ensureColumn($pdo, 'events', 'category', "TEXT NOT NULL DEFAULT 'concert'");
         self::ensureUniqueIndex($pdo, 'artists', 'user_id');
 
+        self::ensureCartItemsTable($pdo);
         $pdo->exec("UPDATE events SET category = 'concert' WHERE category IS NULL OR category = ''");
+    }
+
+    private static function ensureCartItemsTable(PDO $pdo): void
+    {
+        $columns = $pdo->query('PRAGMA table_info(cart_items)')->fetchAll();
+
+        if ($columns !== false && count($columns) > 0) {
+            return;
+        }
+
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS cart_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                ticket_id INTEGER NOT NULL,
+                quantity INTEGER NOT NULL,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+            )'
+        );
+        $pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS cart_items_user_ticket_unique_idx ON cart_items (user_id, ticket_id)');
     }
 
     private static function ensureColumn(PDO $pdo, string $table, string $column, string $definition): void

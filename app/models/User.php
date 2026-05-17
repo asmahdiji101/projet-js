@@ -6,6 +6,11 @@ namespace App\Models;
 
 final class User extends BaseModel
 {
+    public static function normalizeEmail(string $email): string
+    {
+        return strtolower(trim($email));
+    }
+
     public function findById(int $id): ?array
     {
         return $this->fetchOne('SELECT * FROM users WHERE id = :id LIMIT 1', [':id' => $id]);
@@ -13,7 +18,10 @@ final class User extends BaseModel
 
     public function findByEmail(string $email): ?array
     {
-        return $this->fetchOne('SELECT * FROM users WHERE email = :email LIMIT 1', [':email' => $email]);
+        return $this->fetchOne(
+            'SELECT * FROM users WHERE LOWER(email) = LOWER(:email) LIMIT 1',
+            [':email' => self::normalizeEmail($email)]
+        );
     }
 
     public function countAll(): int
@@ -24,6 +32,8 @@ final class User extends BaseModel
 
     public function create(string $fullName, string $email, string $passwordHash, string $role = 'user', ?string $profilePicturePath = null): int
     {
+        $email = self::normalizeEmail($email);
+
         $this->execute(
             'INSERT INTO users (full_name, email, password_hash, role, profile_picture_path) VALUES (:full_name, :email, :password_hash, :role, :profile_picture_path)',
             [
@@ -60,6 +70,7 @@ final class User extends BaseModel
 
     public function updateProfile(int $id, string $fullName, string $email, ?string $passwordHash = null, ?string $profilePicturePath = null): bool
     {
+        $email = self::normalizeEmail($email);
         $sql = 'UPDATE users SET full_name = :full_name, email = :email';
         $params = [
             ':id' => $id,
