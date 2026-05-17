@@ -548,7 +548,7 @@ main {
 .event-body {
     padding: 1.5rem;
     border-radius: 1.5rem;
-    background: rgba(255, 255, 255, 0.96);
+    background: var(--panel-2);
     border: 1px solid var(--border);
 }
 
@@ -570,7 +570,7 @@ main {
 
 .ticket-form-detail {
     grid-template-columns: 1fr auto auto;
-    background: rgba(244, 247, 251, 0.95);
+    background: var(--panel);
 }
 
 .stats-card {
@@ -894,22 +894,22 @@ main {
 }
 
 .admin-surface {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--panel-2);
     border: 1px solid var(--border);
     border-radius: 1rem;
     padding: 1rem;
     margin: 1rem 0;
-    color: #000;
+    color: var(--text);
 }
 
 .admin-surface-reply {
-    background: rgba(236, 250, 245, 0.95);
-    color: #000;
+    background: var(--panel);
+    color: var(--text);
 }
 
 .admin-message-item {
-    background: rgba(255, 255, 255, 0.95);
-    color: #000;
+    background: var(--panel-2);
+    color: var(--text);
 }
 
 .admin-message-actions {
@@ -922,8 +922,8 @@ main {
 }
 
 .notification-card.is-read {
-    background: rgba(255, 255, 255, 0.92);
-    color: #000;
+    background: var(--panel-2);
+    color: var(--text);
 }
 
 .event-card-link {
@@ -973,9 +973,9 @@ main {
     margin: 1rem 0 0;
     padding: 1rem;
     border-radius: 1.25rem;
-    background: rgba(244, 247, 251, 0.9);
+    background: var(--panel-2);
     border: 1px solid var(--border);
-    color: #000;
+    color: var(--text);
 }
 
 .account-avatar {
@@ -1004,7 +1004,7 @@ main {
 }
 
 .hero-copy-feed {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.95));
+    background: var(--panel);
 }
 
 .hero-panel-feed {
@@ -1051,12 +1051,12 @@ main {
 
 .confirm-dialog {
     width: min(100%, 420px);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.98));
-    border: 1px solid rgba(21, 32, 51, 0.12);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
     border-radius: 1.25rem;
     padding: 1.25rem;
     box-shadow: 0 24px 70px rgba(30, 48, 77, 0.24);
-    color: #000;
+    color: var(--text);
 }
 
 .confirm-dialog h3 {
@@ -1106,9 +1106,9 @@ main {
     padding: 1.25rem;
     border-radius: 1.5rem;
     border: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.96));
+    background: var(--panel-2);
     box-shadow: 0 18px 50px rgba(30, 48, 77, 0.08);
-    color: #000;
+    color: var(--text);
 }
 
 .admin-card-head,
@@ -1135,7 +1135,7 @@ main {
 .admin-curve-summary strong,
 .admin-summary-strip strong {
     font-size: 1.6rem;
-    color: #000;
+    color: var(--text);
 }
 
 .revenue-curve {
@@ -1169,9 +1169,9 @@ main {
 .admin-summary-strip article {
     padding: 0.95rem 1rem;
     border-radius: 1.1rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--panel-2);
     border: 1px solid var(--border);
-    color: #000;
+    color: var(--text);
 }
 
 .admin-summary-strip-secondary {
@@ -1198,10 +1198,10 @@ main {
     padding: 1.25rem;
     border-radius: 1.4rem;
     border: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.96));
+    background: var(--panel-2);
     box-shadow: 0 16px 42px rgba(30, 48, 77, 0.08);
     transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-    color: #000;
+    color: var(--text);
 }
 
 .admin-block:hover {
@@ -1220,7 +1220,7 @@ main {
 
 .admin-block strong {
     font-size: 1.3rem;
-    color: #000;
+    color: var(--text);
 }
 
 .admin-block p {
