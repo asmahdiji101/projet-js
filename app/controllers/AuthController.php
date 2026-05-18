@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Booking;
 use App\Models\Artist;
+use App\Models\CartItem;
 use App\Models\User;
 
 final class AuthController extends Controller
@@ -23,7 +24,7 @@ final class AuthController extends Controller
 
     public function login(): void
     {
-        $email = trim($_POST['email'] ?? '');
+        $email = User::normalizeEmail(trim($_POST['email'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
         $user = (new User())->findByEmail($email);
 
@@ -35,6 +36,11 @@ final class AuthController extends Controller
             return;
         }
 
+        if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+            (new CartItem())->mergeSessionCart((int) $user['id'], $_SESSION['cart']);
+            unset($_SESSION['cart']);
+        }
+
         $_SESSION['user'] = [
             'id' => (int) $user['id'],
             'full_name' => $user['full_name'],
@@ -43,7 +49,7 @@ final class AuthController extends Controller
             'profile_picture_path' => $user['profile_picture_path'] ?? null,
         ];
 
-        $redirectTo = $_SESSION['intended'] ?? '/dashboard';
+        $redirectTo = $_SESSION['intended'] ?? '/';
         unset($_SESSION['intended']);
 
         redirect($redirectTo);
@@ -52,7 +58,7 @@ final class AuthController extends Controller
     public function register(): void
     {
         $fullName = trim($_POST['full_name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $email = User::normalizeEmail(trim($_POST['email'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
         $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
         $accountType = trim($_POST['account_type'] ?? 'participant');
@@ -77,7 +83,7 @@ final class AuthController extends Controller
 
         // Handle profile picture upload
         $profilePicturePath = null;
-        $uploadDir = dirname(__DIR__) . '/public/uploads/profiles/';
+        $uploadDir = PUBLIC_PATH . '/uploads/profiles/';
 
         if (!is_dir($uploadDir)) {
             @mkdir($uploadDir, 0755, true);
@@ -143,6 +149,7 @@ final class AuthController extends Controller
 
         if ($role === 'artist') {
             $artistSlug = trim(strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $fullName)), '-');
+            $artistSlug .= '-' . $userId;
             (new Artist())->create(
                 $fullName,
                 $artistSlug,
@@ -202,7 +209,7 @@ final class AuthController extends Controller
         }
 
         $fullName = trim($_POST['full_name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $email = User::normalizeEmail(trim($_POST['email'] ?? ''));
         $newPassword = (string) ($_POST['new_password'] ?? '');
         $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
 
@@ -260,7 +267,7 @@ final class AuthController extends Controller
                 return;
             }
 
-            $uploadDir = dirname(__DIR__) . '/public/uploads/profiles/';
+            $uploadDir = PUBLIC_PATH . '/uploads/profiles/';
             if (!is_dir($uploadDir)) {
                 @mkdir($uploadDir, 0755, true);
             }
@@ -346,11 +353,34 @@ final class AuthController extends Controller
             $artistEvents = $eventModel->byArtistUser((int) $_SESSION['user']['id']);
         }
 
+        $artistBookings = [];
+        if ($_SESSION['user']['role'] === 'artist') {
+            $artistBookings = (new Booking())->byArtistUser((int) $_SESSION['user']['id']);
+        }
+
         $this->render('auth/dashboard', [
             'user' => $_SESSION['user'],
             'bookings' => $bookings,
             'notifications' => $notifications,
             'artistEvents' => $artistEvents,
+            'artistBookings' => $artistBookings,
+        ]);
+    }
+
+    public function bookings(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            redirect('/login');
+        }
+
+        if ($_SESSION['user']['role'] === 'artist') {
+            $bookings = (new Booking())->byArtistUser((int) $_SESSION['user']['id']);
+        } else {
+            $bookings = (new Booking())->byUser((int) $_SESSION['user']['id']);
+        }
+
+        $this->render('auth/bookings', [
+            'bookings' => $bookings,
         ]);
     }
 

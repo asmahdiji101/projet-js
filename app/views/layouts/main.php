@@ -3,56 +3,46 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AIO Events | Event Ticketing</title>
+    <title>The click events | Event Ticketing</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <header class="topbar">
         <div class="brand">
-            <img src="/images/logo.svg" alt="AIO Events" class="brand-logo">
+            <img src="/images/logo.svg" alt="The click events" class="brand-logo">
             <div>
-                <strong>AIO Events</strong>
+                <strong>The click events</strong>
                 <p>Events, tickets and immersive experiences</p>
             </div>
         </div>
-        <nav class="nav">
-            <a href="/">Accueil</a>
-            <a href="/events">Événements</a>
-            <a href="/cart">Panier</a>
-            <?php if (!is_admin()): ?>
-                <a href="/contact">Contact</a>
-            <?php endif; ?>
-            <?php if (is_authenticated()): ?>
-                <a href="/notifications" class="nav-notif">Notifications
-                    <?php $unread = (new \App\Models\Notification())->unreadCount((int) ($_SESSION['user']['id'] ?? 0)); ?>
-                    <?php if ($unread > 0): ?>
-                        <span class="notif-badge"><?= e((string)$unread) ?></span>
-                    <?php endif; ?>
+        
+        <?php if (is_authenticated()): ?>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <a href="/dashboard" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+                    <strong><?= e($_SESSION['user']['full_name']) ?></strong>
+                    <img src="<?= e(avatar_url($_SESSION['user']['profile_picture_path'] ?? null)) ?>" alt="Avatar" class="nav-avatar" onerror="this.src='/images/default-avatar.svg'">
                 </a>
-                <?php if ($_SESSION['user']['role'] === 'artist'): ?>
-                    <a href="/events/artist-events">Mes événements</a>
-                <?php endif; ?>
-                <a href="/dashboard">Mon compte</a>
-                <a href="/account/edit">Modifier le compte</a>
-                <?php if (is_admin()): ?>
-                    <a href="/events/create">Créer un événement</a>
-                    <a href="/artists">Artistes</a>
-                    <a href="/admin">Administration</a>
-                <?php endif; ?>
-                <a href="/logout" data-confirm="Voulez-vous vraiment vous déconnecter ?">Déconnexion</a>
-
-                <?php $avatar = avatar_url($_SESSION['user']['profile_picture_path'] ?? null); ?>
-                <img src="<?= e($avatar) ?>" alt="avatar" class="nav-avatar">
-            <?php else: ?>
-                <a href="/login">Connexion</a>
-                <a href="/register">Inscription</a>
-            <?php endif; ?>
-        </nav>
+            </div>
+        <?php endif; ?>
     </header>
 
-    <main>
-        <?php require $viewFile; ?>
-    </main>
+    <?php $layoutSidebar = $layoutSidebar ?? true; ?>
+
+    <?php if ($layoutSidebar): ?>
+        <div class="app-shell">
+            <aside class="app-sidebar">
+                <?php require VIEW_PATH . '/partials/navigation.php'; ?>
+            </aside>
+
+            <main class="app-main">
+                <?php require $viewFile; ?>
+            </main>
+        </div>
+    <?php else: ?>
+        <main>
+            <?php require $viewFile; ?>
+        </main>
+    <?php endif; ?>
 
     <script src="/js/main.js"></script>
 </body>

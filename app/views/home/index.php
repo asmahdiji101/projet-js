@@ -2,25 +2,15 @@
     <aside class="home-sidebar home-sidebar-left">
         <div class="home-panel home-brand-panel">
             <div class="home-brand-row">
-                <img src="/images/logo.svg" alt="AIO Events" class="home-brand-logo">
+                <img src="/images/logo.svg" alt="The click events" class="home-brand-logo">
                 <div>
-                    <strong>AIO Events</strong>
+                    <strong>The click events</strong>
                     <p>Discover, book, follow.</p>
                 </div>
             </div>
         </div>
 
-        <div class="home-panel home-menu-panel">
-            <div class="home-menu-title">Navigation</div>
-            <a class="home-menu-item is-active" href="/">Accueil</a>
-            <a class="home-menu-item" href="/events">Carte</a>
-            <a class="home-menu-item" href="/notifications">Notifications</a>
-            <a class="home-menu-item" href="/contact">Support</a>
-            <?php if (is_authenticated()): ?>
-                <a class="home-menu-item" href="/dashboard">Mon compte</a>
-                <a class="home-menu-item" href="/account/edit">Modifier le compte</a>
-            <?php endif; ?>
-        </div>
+        <?php require VIEW_PATH . '/partials/navigation.php'; ?>
 
         <div class="home-panel home-download-panel">
             <div class="home-menu-title">Télécharger l'App</div>
@@ -29,38 +19,39 @@
         </div>
     </aside>
 
-    <section class="home-center">
-        <div class="home-panel home-search-panel">
-            <form method="get" action="/" class="home-search-form">
-                <label class="home-search-field home-search-main">
-                    <span>Rechercher...</span>
-                    <input type="search" name="q" value="<?= e($filters['query'] ?? '') ?>" placeholder="Search events">
-                </label>
-                <label class="home-search-field">
-                    <span>Date</span>
-                    <input type="date" name="date" value="<?= e($filters['date'] ?? '') ?>">
-                </label>
-                <label class="home-search-field">
-                    <span>Ville</span>
-                    <input type="text" name="city" value="<?= e($filters['city'] ?? '') ?>" placeholder="City">
-                </label>
-                <label class="home-search-field">
-                    <span>Type</span>
-                    <select name="category">
-                        <option value="">All</option>
-                        <?php foreach ($categories as $key => $label): ?>
-                            <option value="<?= e($key) ?>" <?= ($filters['category'] ?? '') === $key ? 'selected' : '' ?>><?= e($label) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </label>
-                <button type="submit" class="home-search-submit" aria-label="Search events">⌕</button>
-            </form>
-        </div>
+    <div class="home-panel home-search-panel">
+        <form method="get" action="/" class="home-search-form">
+            <label class="home-search-field home-search-main">
+                <span>Rechercher...</span>
+                <input type="search" name="q" value="<?= e($filters['query'] ?? '') ?>" placeholder="Search events">
+            </label>
+            <label class="home-search-field">
+                <span>Date</span>
+                <input type="date" name="date" value="<?= e($filters['date'] ?? '') ?>">
+            </label>
+            <label class="home-search-field">
+                <span>Ville</span>
+                <input type="text" name="city" value="<?= e($filters['city'] ?? '') ?>" placeholder="City">
+            </label>
+            <label class="home-search-field">
+                <span>Type</span>
+                <select name="category">
+                    <option value="">All</option>
+                    <?php foreach ($categories as $key => $label): ?>
+                        <option value="<?= e($key) ?>" <?= ($filters['category'] ?? '') === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <button type="submit" class="home-search-submit" aria-label="Search events">⌕</button>
+        </form>
+    </div>
 
-        <div class="home-categories">
+    <section class="home-center">
+
+        <div class="home-categories" aria-label="Event types">
             <?php foreach ($categories as $key => $label): ?>
                 <a class="home-category-card <?= ($filters['category'] ?? '') === $key ? 'is-active' : '' ?>" href="/?category=<?= e($key) ?>">
-                    <span class="home-category-icon"><?= e(substr($label, 0, 1)) ?></span>
+                    <img class="home-category-icon-image" src="/images/event-types/<?= e($key) ?>.svg" alt="<?= e($label) ?>">
                     <strong><?= e($label) ?></strong>
                 </a>
             <?php endforeach; ?>
@@ -87,7 +78,7 @@
                             <?php if (!empty($event['image_path'])): ?>
                                 <img src="<?= e($event['image_path']) ?>" alt="<?= e($event['title']) ?>">
                             <?php else: ?>
-                                <div class="home-feed-placeholder">AIO</div>
+                                <div class="home-feed-placeholder">The click events</div>
                             <?php endif; ?>
                         </div>
 
@@ -116,7 +107,7 @@
             </div>
 
             <div class="home-side-list">
-                <?php foreach (array_slice($events, 0, 3) as $event): ?>
+                <?php foreach ($homeTrends as $event): ?>
                     <a class="home-side-card" href="/events/<?= (int) $event['id'] ?>">
                         <strong><?= e($event['title']) ?></strong>
                         <small><?= e($event['location']) ?></small>
@@ -132,7 +123,7 @@
             </div>
 
             <div class="home-side-list">
-                <?php foreach (array_slice(array_values(array_filter(array_unique(array_map(static fn (array $event): string => (string) ($event['location'] ?? ''), $events)))), 0, 5) as $place): ?>
+                <?php foreach ($homePlaces as $place): ?>
                     <div class="home-place-card">
                         <strong><?= e($place) ?></strong>
                         <small>Popular venue</small>

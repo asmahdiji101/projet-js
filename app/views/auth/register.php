@@ -45,7 +45,10 @@
             <small>JPG, PNG, GIF, or WebP. Required for artists, optional for participants.</small>
         </label>
 
-        <button type="submit" class="button button-primary">Créer le compte</button>
+        <div class="form-actions">
+            <button type="submit" class="button button-primary">Créer le compte</button>
+            <a href="/login" class="button button-secondary">Se connecter</a>
+        </div>
     </form>
 
     <script>

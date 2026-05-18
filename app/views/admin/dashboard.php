@@ -1,43 +1,104 @@
-<section class="auth-card">
-    <span class="eyebrow">Administration</span>
-    <h1>Tableau de bord</h1>
-    <p class="admin-live-meta">Mise a jour automatique active - <span id="admin-updated-at">initialisation...</span></p>
+<?php
+$revenueValues = $revenueCurve['values'] ?? [];
+$revenueLabels = $revenueCurve['labels'] ?? [];
+$points = [];
+$areaPoints = [];
+$countValues = count($revenueValues);
+$maxRevenue = max(1.0, (float) max($revenueValues ?: [1]));
+$minX = 10;
+$maxX = 790;
+$minY = 150;
+$maxY = 10;
 
-    <div class="cards admin-stats">
-        <article class="card">
-            <h3>Utilisateurs</h3>
-            <strong><?= e((string) $stats['users']) ?></strong>
-        </article>
-        <article class="card">
-            <h3>Artistes</h3>
-            <strong><?= e((string) $stats['artists']) ?></strong>
-            <a class="admin-card-link" href="/artists">Voir les artistes</a>
-        </article>
-        <article class="card">
-            <h3>Événements</h3>
-            <strong><?= e((string) $stats['events']) ?></strong>
-        </article>
-        <article class="card">
-            <h3>Réservations</h3>
-            <strong><?= e((string) $stats['bookings']) ?></strong>
-        </article>
-        <article class="card">
-            <h3>Revenu</h3>
-            <strong id="stat-revenue"><?= e(number_format((float) $stats['revenue'], 2)) ?> EUR</strong>
-        </article>
-        <article class="card card-pending">
-            <h3>Evenements en attente</h3>
-            <strong id="stat-pending-events"><?= e((string) $stats['pending_events']) ?></strong>
-        </article>
-        <article class="card card-pending">
-            <h3>Messages en attente</h3>
-            <strong id="stat-pending-messages"><?= e((string) $stats['pending_messages']) ?></strong>
-        </article>
-        <article class="card">
-            <h3>Notifications admin</h3>
-            <strong id="stat-unread-notifications"><?= e((string) $stats['unread_notifications']) ?></strong>
-            <a class="admin-card-link" href="/notifications">Ouvrir les notifications</a>
-        </article>
+for ($index = 0; $index < $countValues; $index++) {
+    $x = $countValues > 1 ? $minX + (($maxX - $minX) * $index / ($countValues - 1)) : 400;
+    $value = (float) $revenueValues[$index];
+    $y = $maxY + (($minY - $maxY) * (1 - ($value / $maxRevenue)));
+    $points[] = round($x, 2) . ',' . round($y, 2);
+    $areaPoints[] = round($x, 2) . ',' . round($y, 2);
+}
+$areaPolygon = $points ? '10,170 ' . implode(' ', $areaPoints) . ' 790,170' : '';
+?>
+
+<section class="admin-shell">
+    <div class="admin-top-grid">
+        <div class="admin-curve-card">
+            <div class="admin-card-head">
+                <div>
+                    <span class="eyebrow">Administration</span>
+                    <h1>Tableau de bord</h1>
+                </div>
+                <div class="admin-live-meta">Mise a jour automatique active - <span id="admin-updated-at">initialisation...</span></div>
+            </div>
+            <div class="admin-curve-summary">
+                <div>
+                    <span>Revenue</span>
+                    <strong id="stat-revenue"><?= e(number_format((float) $stats['revenue'], 2)) ?> EUR</strong>
+                </div>
+                <div>
+                    <span>Current trend</span>
+                    <strong><?= e((string) ($stats['events'] ?? 0)) ?> events</strong>
+                </div>
+            </div>
+            <svg viewBox="0 0 800 180" class="revenue-curve" preserveAspectRatio="none" aria-label="Revenue curve">
+                <defs>
+                    <linearGradient id="curveFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#4de1c1" stop-opacity="0.35" />
+                        <stop offset="100%" stop-color="#4de1c1" stop-opacity="0.03" />
+                    </linearGradient>
+                </defs>
+                <polygon points="<?= e($areaPolygon) ?>" fill="url(#curveFill)" />
+                <polyline points="<?= e(implode(' ', $points)) ?>" fill="none" stroke="#ff8a3d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="revenue-months">
+                <?php foreach ($revenueLabels as $label): ?>
+                    <span><?= e($label) ?></span>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="admin-summary-panel">
+            <div class="admin-summary-strip">
+                <article>
+                    <span>Users</span>
+                    <strong><?= e((string) $stats['users']) ?></strong>
+                </article>
+                <article>
+                    <span>Artists</span>
+                    <strong><?= e((string) $stats['artists']) ?></strong>
+                </article>
+                <article>
+                    <span>Events</span>
+                    <strong><?= e((string) $stats['events']) ?></strong>
+                </article>
+                <article>
+                    <span>Reservations</span>
+                    <strong><?= e((string) $stats['bookings']) ?></strong>
+                </article>
+            </div>
+
+            <div class="admin-summary-strip admin-summary-strip-secondary">
+                <article>
+                    <span>Pending events</span>
+                    <strong id="stat-pending-events"><?= e((string) $stats['pending_events']) ?></strong>
+                </article>
+                <article>
+                    <span>Messages</span>
+                    <strong id="stat-pending-messages"><?= e((string) $stats['pending_messages']) ?></strong>
+                </article>
+                <article>
+                    <span>Notifications</span>
+                    <strong id="stat-unread-notifications"><?= e((string) $stats['unread_notifications']) ?></strong>
+                </article>
+            </div>
+
+            <div class="admin-mini-links">
+                <a href="/artists" class="admin-mini-link">Artists</a>
+                <a href="/notifications" class="admin-mini-link">Notifications</a>
+                <a href="/admin/revenue" class="admin-mini-link">Revenue</a>
+                <a href="/admin/bookings" class="admin-mini-link">Reservations</a>
+            </div>
+        </div>
     </div>
 
     <div class="section-heading" style="margin-top:2rem;">

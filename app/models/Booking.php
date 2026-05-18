@@ -19,6 +19,20 @@ final class Booking extends BaseModel
         );
     }
 
+    public function byArtistUser(int $userId): array
+    {
+        return $this->fetchAll(
+            'SELECT bookings.*, tickets.name AS ticket_name, events.title AS event_title, events.id AS event_id, events.user_artist_id, events.artist_id, users.full_name AS buyer_name
+             FROM bookings
+             INNER JOIN tickets ON tickets.id = bookings.ticket_id
+             INNER JOIN events ON events.id = tickets.event_id
+             INNER JOIN users ON users.id = bookings.user_id
+             WHERE events.user_artist_id = :user_id OR events.artist_id IN (SELECT id FROM artists WHERE user_id = :user_id)
+             ORDER BY bookings.created_at DESC',
+            [':user_id' => $userId]
+        );
+    }
+
     public function countAll(): int
     {
         $row = $this->fetchOne('SELECT COUNT(*) AS count FROM bookings');
@@ -71,6 +85,40 @@ final class Booking extends BaseModel
              ORDER BY revenue DESC',
             [':status' => 'confirmed']
         );
+    }
+
+    public function revenueByMonth(int $months = 12): array
+    {
+        $rows = $this->fetchAll(
+            'SELECT strftime("%Y-%m", bookings.created_at) AS month_key, COALESCE(SUM(bookings.total_price), 0) AS revenue
+             FROM bookings
+             WHERE bookings.status = :status
+             GROUP BY strftime("%Y-%m", bookings.created_at)
+             ORDER BY month_key ASC',
+            [':status' => 'confirmed']
+        );
+
+        $rowMap = [];
+        foreach ($rows as $row) {
+            $rowMap[(string) $row['month_key']] = (float) $row['revenue'];
+        }
+
+        $labels = [];
+        $values = [];
+        $current = new \DateTimeImmutable('first day of this month');
+        $start = $current->modify('-' . max(0, $months - 1) . ' months');
+
+        for ($index = 0; $index < $months; $index++) {
+            $month = $start->modify('+' . $index . ' months');
+            $key = $month->format('Y-m');
+            $labels[] = $month->format('M');
+            $values[] = $rowMap[$key] ?? 0.0;
+        }
+
+        return [
+            'labels' => $labels,
+            'values' => $values,
+        ];
     }
 
     public function create(int $userId, int $ticketId, int $quantity, float $totalPrice): int

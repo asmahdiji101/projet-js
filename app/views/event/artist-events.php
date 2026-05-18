@@ -1,6 +1,6 @@
 <div class="page-header">
     <h1>Mes événements</h1>
-    <a href="/events/artist/create" class="button button-primary">+ Créer un événement</a>
+    <a href="/events/create" class="button button-primary">+ Créer un événement</a>
 </div>
 
 <?php if (empty($events)): ?>

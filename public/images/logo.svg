@@ -1,11 +1,43 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="g1" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4DE1C1"/>
-      <stop offset="1" stop-color="#FF8A3D"/>
-    </linearGradient>
-  </defs>
-  <rect x="4" y="4" width="56" height="56" rx="18" fill="url(#g1)"/>
-  <path d="M18 40V24L29 34L40 24V40" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="48" cy="18" r="4" fill="white" fill-opacity="0.9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" width="100%" height="100%">
+    <defs>
+        <filter id="sticker" x="-20%" y="-20%" width="140%" height="140%">
+            <feMorphology in="SourceAlpha" operator="dilate" radius="7" result="DILATED" />
+            <feGaussianBlur in="DILATED" stdDeviation="1.5" result="BLURRED" />
+            <feComponentTransfer in="BLURRED" result="ROUNDED">
+                <feFuncA type="linear" slope="15" intercept="-5"/>
+            </feComponentTransfer>
+            <feFlood flood-color="#fdfbf5" result="CREAM" />
+            <feComposite in="CREAM" in2="ROUNDED" operator="in" result="OUTLINE" />
+            <feMerge>
+                <feMergeNode in="OUTLINE" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+        <style>
+            .logo-text {
+                font-family: 'Georgia', 'Times New Roman', serif;
+                font-size: 42px;
+                font-weight: 900;
+                fill: #0a0a0f;
+                letter-spacing: -1px;
+            }
+            .star {
+                fill: #0a0a0f;
+            }
+        </style>
+    </defs>
+
+    <g filter="url(#sticker)">
+        <text x="45" y="55" class="logo-text">The Click</text>
+        <text x="80" y="95" class="logo-text">Events</text>
+        
+        <!-- Large Star top right -->
+        <path class="star" d="M 230 35 Q 235 35 235 25 Q 235 35 240 35 Q 235 35 235 45 Q 235 35 230 35 Z" />
+        
+        <!-- Small Star 1 bottom left -->
+        <path class="star" d="M 50 85 Q 53 85 53 78 Q 53 85 56 85 Q 53 85 53 92 Q 53 85 50 85 Z" />
+        
+        <!-- Small Star 2 bottom left -->
+        <path class="star" d="M 35 75 Q 37 75 37 71 Q 37 75 39 75 Q 37 75 37 79 Q 37 75 35 75 Z" />
+    </g>
 </svg>

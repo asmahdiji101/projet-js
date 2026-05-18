@@ -16,8 +16,9 @@
             <input type="password" name="password" required>
         </label>
 
+        <div class="form-actions">
         <button type="submit" class="button button-primary">Se connecter</button>
+        <a href="/register" class="button button-secondary">Créer un compte</a>
+    </div>
     </form>
-
-    <p>Pas encore de compte ? <a href="/register">Créer un compte</a></p>
 </section>

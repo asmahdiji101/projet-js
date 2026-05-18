@@ -152,6 +152,9 @@ switch ($uri) {
     case '/dashboard':
         (new AuthController())->dashboard();
         break;
+    case '/bookings':
+        (new AuthController())->bookings();
+        break;
     case '/admin':
         (new AdminController())->dashboard();
         break;

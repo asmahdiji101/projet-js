@@ -90,7 +90,13 @@ function avatar_url(?string $path = null): string
         return $defaultAvatar;
     }
 
-    $normalizedPath = $path;
+    // Normalize Windows backslashes and strip any leading public folder references
+    $normalizedPath = str_replace('\\', '/', $path);
+    $normalizedPath = preg_replace('#^/public/#', '/', $normalizedPath);
+
+    if ($normalizedPath === '') {
+        return $defaultAvatar;
+    }
 
     if ($normalizedPath[0] !== '/') {
         $normalizedPath = '/' . ltrim($normalizedPath, '/');

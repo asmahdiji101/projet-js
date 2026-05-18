@@ -8,7 +8,7 @@
 
     <?php $avatar = avatar_url($user['profile_picture_path'] ?? null); ?>
     <div class="account-hero">
-        <img src="<?= e($avatar) ?>" alt="avatar" class="account-avatar">
+        <img src="<?= e($avatar) ?>" alt="avatar" class="account-avatar" onerror="this.src='/images/default-avatar.svg'">
         <div>
             <p class="account-note">Change your name, email, password and profile picture here.</p>
             <?php if (($user['role'] ?? 'user') === 'artist' && !empty($artist)): ?>

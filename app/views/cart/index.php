@@ -1,7 +1,4 @@
-<section class="auth-card">
-    <span class="eyebrow">Cart</span>
-    <h1>Your selection</h1>
-
+<div class="cart-shell">
     <?php if (!empty($_SESSION['flash_error'])): ?>
         <div class="alert alert-error"><?= e($_SESSION['flash_error']) ?></div>
         <?php unset($_SESSION['flash_error']); ?>
@@ -12,33 +9,48 @@
         <?php unset($_SESSION['flash_success']); ?>
     <?php endif; ?>
 
-    <?php if (empty($tickets)): ?>
-        <p>Your cart is empty. Go to <a href="/events">events</a> and add tickets.</p>
-    <?php else: ?>
-        <div class="cart-items">
-            <?php foreach ($tickets as $ticket): ?>
-                <article class="cart-item">
-                    <div>
-                        <h3><?= e($ticket['name']) ?></h3>
-                        <p>Quantity: <?= e((string) $ticket['quantity']) ?></p>
-                        <p>Unit price: <?= e(number_format((float) $ticket['price'], 2)) ?> EUR</p>
+    <section class="cart-content">
+        <!-- Cart Items Sidebar -->
+        <aside class="cart-sidebar">
+            <div class="cart-card">
+                <h2>Votre panier</h2>
+
+                <?php if (empty($tickets)): ?>
+                    <div class="empty-cart">
+                        <p>Votre panier est vide</p>
+                        <p class="small-text">Ajoutez des billets depuis la liste des événements à gauche</p>
                     </div>
-                    <div>
-                        <strong><?= e(number_format((float) $ticket['line_total'], 2)) ?> EUR</strong>
-                        <form method="post" action="/cart/remove">
-                            <input type="hidden" name="ticket_id" value="<?= e((string) $ticket['id']) ?>">
-                            <button class="button button-secondary" type="submit">Remove</button>
+                <?php else: ?>
+                    <div class="cart-items-list">
+                        <?php foreach ($tickets as $ticket): ?>
+                            <article class="cart-item-row">
+                                <div class="item-info">
+                                    <h4><?= e($ticket['event_title'] ?? $ticket['name']) ?></h4>
+                                    <p class="item-ticket"><?= e($ticket['ticket_name'] ?? $ticket['name']) ?></p>
+                                    <p class="item-price">
+                                        <?= (int)$ticket['quantity'] ?> × <?= e(number_format((float)$ticket['price'], 2)) ?> TND = <strong><?= e(number_format((float)$ticket['line_total'], 2)) ?> TND</strong>
+                                    </p>
+                                </div>
+                                <form method="post" action="/cart/remove" class="item-remove">
+                                    <input type="hidden" name="ticket_id" value="<?= e((string)($ticket['ticket_id'] ?? $ticket['id'])) ?>">
+                                    <button type="submit" class="button button-secondary button-tiny">✕</button>
+                                </form>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="cart-total">
+                        <div class="total-row">
+                            <span>Total:</span>
+                            <strong><?= e(number_format((float)$total, 2)) ?> TND</strong>
+                        </div>
+                        <form method="post" action="/checkout">
+                            <button class="button button-primary button-block" type="submit">Confirmer la réservation</button>
                         </form>
                     </div>
-                </article>
-            <?php endforeach; ?>
-        </div>
+                <?php endif; ?>
+            </div>
+        </aside>
+    </section>
 
-        <div class="cart-summary">
-            <strong>Total: <?= e(number_format((float) $total, 2)) ?> EUR</strong>
-            <form method="post" action="/checkout">
-                <button class="button button-primary" type="submit">Confirm booking</button>
-            </form>
-        </div>
-    <?php endif; ?>
 </section>
